@@ -2,21 +2,30 @@ import json
 import os
 import windy.handlers
 import windy.middleware
+import windy.templates
 
 from pprint import pprint
 
 class Windy():
 	def __init__(self):
+		self.confdir=self._get_config_dir_path()
 		self.routes=self.get_routes()
 		self.middleware_fuctions=self.load_middleware()
-
+		print(self.middleware_fuctions)
+		self.render=templates.render
+		
 		self.http_200='200 OK'
 		self.http_404='404 NOT FOUND'
-		self.response_headers=[('Content-type', 'text/plain')]
+		self.response_headers=[('Content-type', 'text/html')]
 		self.default='not_found'
 	
 	def load_middleware(self):
 		return middleware.import_functions()
+		
+	def _get_config_dir_path(self):
+		dirname = os.path.abspath(os.path.dirname(__file__))
+		confdir=os.path.join(dirname,"conf")
+		return confdir
 		
 	def get_routes(self):
 		dirname = os.path.dirname(__file__)
@@ -41,5 +50,5 @@ class Windy():
 		request=middleware.invoke(self,request,environ)
 		pprint(request)
 		handler=self.get_handler(environ['PATH_INFO'])
-		retval=handler(self,environ,start_response)
+		retval=handler(self,environ,start_response,request)
 		return retval

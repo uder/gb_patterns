@@ -1,12 +1,16 @@
-def root(self,environ,start_response):
-	start_response(self.http_200, self.response_headers)
+def root(windy,environ,start_response,request):
+	author=request.get('author',None)
+	start_response(windy.http_200, windy.response_headers)
+	html=windy.render('index.html', author=author).encode('utf-8')
+	print(type(html))
+	return [html]
 	
-	return [b'Index Page']
+def about(windy,environ,start_response,request):
+	author=request.get('author',None)
+	start_response(windy.http_200, windy.response_headers)
+	html=windy.render('about.html', author=author).encode('utf-8')
+	return [html]
 	
-def about(self,environ,start_response):
-	start_response(self.http_200, self.response_headers)
-	return [b'About Page']
-	
-def not_found(self,environ,start_response):
-	start_response(self.http_404, self.response_headers)
+def not_found(windy,environ,start_response,request):
+	start_response(windy.http_404, windy.response_headers)
 	return [b'NOT EXISTENT PAGE '+environ['PATH_INFO'].encode('utf-8')]
