@@ -11,7 +11,7 @@ class Windy():
 		self.confdir=self._get_config_dir_path()
 		self.routes=self.get_routes()
 		self.middleware_fuctions=self.load_middleware()
-		print(self.middleware_fuctions)
+
 		self.render=templates.render
 		
 		self.http_200='200 OK'

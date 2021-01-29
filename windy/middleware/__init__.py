@@ -30,6 +30,5 @@ def invoke(windy,request,environ):
 	funcs_list=windy.middleware_fuctions
 	print(funcs_list)
 	for func in funcs_list:
-		print(func.__name__)
 		request=func(windy,request,environ)
 	return request
