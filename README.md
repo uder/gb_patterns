@@ -4,4 +4,8 @@
 
 cd gb_patterns && uwsgi --http :8000 --wsgi-file main.py
 
-http://127.0.0.1:8000
+Тесты:
+	Index:
+		http://127.0.0.1:8000/ 
+	About:
+		http://127.0.0.1:8000/about
