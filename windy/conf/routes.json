@@ -1,0 +1,10 @@
+[
+	{
+		"path":		"/",
+		"handler":	"root"
+	},
+	{
+		"path":		"/about/",
+		"handler":	"about"
+	}
+]
