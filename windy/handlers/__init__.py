@@ -2,7 +2,6 @@ def root(windy,environ,start_response,request):
 	author=request.get('author',None)
 	start_response(windy.http_200, windy.response_headers)
 	html=windy.render('index.html', author=author).encode('utf-8')
-	print(type(html))
 	return [html]
 	
 def about(windy,environ,start_response,request):
