@@ -45,10 +45,8 @@ class Windy():
 		return func
 		
 	def __call__(self,environ,start_response):
-		# path=environ['PATH_INFO']
 		request={}
 		request=middleware.invoke(self,request,environ)
-		pprint(request)
 		handler=self.get_handler(environ['PATH_INFO'])
 		retval=handler(self,environ,start_response,request)
 		return retval
