@@ -7,7 +7,6 @@ from pprint import pprint
 
 
 def iter_namespace(pkg,path):
-	print(path)
 	return pkgutil.iter_modules(path,pkg.__name__+".")
 
 
@@ -16,7 +15,6 @@ def import_functions():
 	funcs_list=[]
 	for item in iter_namespace(sys.modules[__name__], [path]):
 		m = import_module(item.name)
-		pprint(item)
 		funcs=_get_funcs(m)
 		funcs_list.extend(funcs)
 	return funcs_list
@@ -30,7 +28,6 @@ def _get_funcs(m):
 
 def invoke(windy,request,environ):
 	funcs_list=windy.middleware_fuctions
-	print(funcs_list)
 	for func in funcs_list:
 		request=func(windy,request,environ)
 	return request
