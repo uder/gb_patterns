@@ -6,5 +6,9 @@
 	{
 		"path":		"/about/",
 		"handler":	"about"
+	},
+	{
+		"path": 	"/feedback/",
+		"handler": 	"feedback"
 	}
 ]
