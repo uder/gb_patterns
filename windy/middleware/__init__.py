@@ -1,29 +1,31 @@
 import os
 import sys
+import pkgutil
 from importlib import import_module
+from inspect import getmembers, isfunction, currentframe
 from pprint import pprint
+
+
+def iter_namespace(pkg,path):
+	print(path)
+	return pkgutil.iter_modules(path,pkg.__name__+".")
+
 
 def import_functions():
 	path=os.path.dirname(__file__)
-	func_files=os.listdir(path)
 	funcs_list=[]
-	for f in func_files:
-		if not f.startswith("_") and f.endswith(".py"):
-			file=os.path.join(path,f)
-			m=import_module ("."+f[:-3],package=__name__)
-			funcs=_get_funcs(m)
-			funcs_list.extend(funcs)
+	for item in iter_namespace(sys.modules[__name__], [path]):
+		m = import_module(item.name)
+		pprint(item)
+		funcs=_get_funcs(m)
+		funcs_list.extend(funcs)
 	return funcs_list
 			
 def _get_funcs(m):
-	obj_list=dir(m)
-	obj_dict=globals()
 	funcs_list=[]
-	for item in obj_list:
-		if item[:1]!="_":
-			func=getattr(m,item)
-			if callable(func):
-				funcs_list.append(func)
+	for name, func in getmembers(m,isfunction):
+		if not name.startswith("_") and sys.modules[__name__].__name__ in func.__module__:
+			funcs_list.append(func)
 	return funcs_list
 
 def invoke(windy,request,environ):
