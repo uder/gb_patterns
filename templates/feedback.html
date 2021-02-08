@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Feedback</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %} About {% endblock %}
+
+{% block body %}
     <h1>Форма обратной связи</h1>
     <form method="post">
         <h3>Написать нам Вы можете используя эту форму:</h3>
@@ -18,5 +15,4 @@
         <input type="text" name="message"><br>
         <input type="submit" value="Отправить">
     </form>
-</body>
-</html>
+{% endblock %}
