@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %} Feedback {% endblock %}
+
+{% block body %}
+    <h1>Форма добавления категории</h1>
+    <form method="post">
+        <h3>Добавить категорию</h3>
+        <label for="category_name">Название категории:</label><br>
+        <input type="text" name="category_name" placeholder="Название"><br>
+        <label for="category_desc">Описание категории:</label><br>
+        <input type="text" name="category_desc" placeholder="Описание"><br>
+        <input type="submit" value="Отправить">
+    </form>
+{% endblock %}

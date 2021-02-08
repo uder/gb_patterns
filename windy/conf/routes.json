@@ -10,5 +10,17 @@
 	{
 		"path": 	"/feedback/",
 		"handler": 	"feedback"
+	},
+	{
+		"path":		"/create-course/",
+		"handler":	"create_course"
+	},
+	{
+		"path": 	"/create-category/",
+		"handler": 	"create_category"
+	},
+	{
+		"path": 	"/category-list/",
+		"handler": 	"category_list"
 	}
 ]
