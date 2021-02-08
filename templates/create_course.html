@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %} Feedback {% endblock %}
+
+{% block body %}
+    <h1>Форма добавления курса</h1>
+    <form method="post">
+        <h3>Добавить курс</h3>
+        <label for="course_name">Название курса:</label><br>
+        <input type="text" name="course_name" placeholder="Название"><br>
+        <label for="cousre_duration">Продолжительность:</label><br>
+        <input type="text" name="course_duration" placeholder="Продолжительность"><br>
+        <input type="submit" value="Отправить">
+    </form>
+{% endblock %}

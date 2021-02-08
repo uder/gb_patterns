@@ -23,6 +23,22 @@ def feedback(windy,environ,start_response,request):
 	html=windy.render('feedback.html', **request).encode('utf-8')
 	return [html]
 
+def create_course(windy,environ,start_response,request):
+	start_response(windy.http_200, windy.response_headers)
+	html=windy.render('create_course.html', **request).encode('utf-8')
+	return [html]
+
+def create_category(windy,environ,start_response,request):
+	start_response(windy.http_200, windy.response_headers)
+	html=windy.render('create_category.html', **request).encode('utf-8')
+	return [html]
+
+def category_list(windy,environ,start_response,request):
+	start_response(windy.http_200, windy.response_headers)
+	html=windy.render('category_list.html', **request).encode('utf-8')
+	return [html]
+
+
 def not_found(windy,environ,start_response,request):
 	start_response(windy.http_404, windy.response_headers)
 	return [b'NOT EXISTENT PAGE '+environ['PATH_INFO'].encode('utf-8')]
