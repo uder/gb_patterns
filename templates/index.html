@@ -1,7 +1,11 @@
 {% extends "base.html" %}
-{% block title %} Main {% endblock %}
+{% block title %} Список курсов {% endblock %}
 
 {% block body %}
     <h1>Обучение программированию</h1>
     <h3>Author: {{author}}</h3>
+    {% include "include/course_list.html" %}
 {% endblock %}
+
+
+
