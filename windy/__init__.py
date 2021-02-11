@@ -3,6 +3,7 @@ import os
 import windy.handlers
 import windy.middleware
 import windy.templates
+from windy.models.logger import WindyLogger
 
 from pprint import pprint
 
@@ -13,6 +14,7 @@ class Windy():
 		self.middleware_fuctions=self.load_middleware()
 
 		self.render=templates.render
+		self.logger=WindyLogger()
 		
 		self.http_200='200 OK'
 		self.http_404='404 NOT FOUND'
