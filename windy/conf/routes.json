@@ -22,5 +22,10 @@
 	{
 		"path": 	"/category-list/",
 		"handler": 	"category_list"
+	},
+		{
+		"path": 	"/create-user/",
+		"handler": 	"create_user"
 	}
+
 ]
