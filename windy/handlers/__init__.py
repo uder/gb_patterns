@@ -1,3 +1,6 @@
+from pprint import pprint
+from windy.models.user import User
+
 def root(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
 	html=windy.render('index.html', **request).encode('utf-8')
@@ -38,6 +41,23 @@ def category_list(windy,environ,start_response,request):
 	html=windy.render('category_list.html', **request).encode('utf-8')
 	return [html]
 
+def create_user(windy,environ,start_response,request):
+	start_response(windy.http_200, windy.response_headers)
+	if request['method'] == 'POST':
+		user_name = request['data'].get('user_name', "Anonymous")
+		user_role = request['data'].get('user_role')
+
+		#user=windy.models.User.create(user_name,user_role)
+		user = User.create(user_name, user_role)
+		user.say()
+		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
+
+		print("---")
+		print(f'New {user_role} have joined. {user_role}\'s name is {user_name}')
+		print("---")
+
+	html = windy.render('create_user.html', **request).encode('utf-8')
+	return [html]
 
 def not_found(windy,environ,start_response,request):
 	start_response(windy.http_404, windy.response_headers)

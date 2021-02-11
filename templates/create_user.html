@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %} Create User {% endblock %}
+
+{% block body %}
+    <h1>Форма добавления пользователя</h1>
+    <form method="post">
+        <h3>Создать пользователя</h3>
+        <label for="user_name">Имя:</label><br>
+        <input type="text" name="user_name" placeholder="Имя"><br>
+        <label for="user_role">Роль пользователя:</label><br>
+        <input type="radio" name="user_role" value="student" id="student" checked>
+        <label for="student">Студент</label><br>
+        <input type="radio" name="user_role" value="teacher" id="teacher">
+        <label for="teacher">Преподаватель</label><br>
+        <input type="submit" value="Отправить">
+    </form>
+{% endblock %}
