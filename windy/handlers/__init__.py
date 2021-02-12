@@ -19,9 +19,7 @@ def feedback(windy,environ,start_response,request):
 		subject=request['data'].get('subject','Without Subject')
 		message=request['data'].get('message','Empty Message')
 
-		print("---")
-		print(f'We have received Feedback from: "{name}" with return mail: "{email}" with subject: "{subject}" and message: "{message}"')
-		print("---")
+		windy.logger.log('INFO', "feedback", f'We have received Feedback from: "{name}" with return mail: "{email}" with subject: "{subject}" and message: "{message}"')
 
 	html=windy.render('feedback.html', **request).encode('utf-8')
 	return [html]
@@ -49,12 +47,12 @@ def create_user(windy,environ,start_response,request):
 
 		#user=windy.models.User.create(user_name,user_role)
 		user = User.create(user_name, user_role)
-		user.say()
+		#user.say()
 		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
 
-		print("---")
-		print(f'New {user_role} have joined. {user_role}\'s name is {user_name}')
-		print("---")
+		#print("---")
+		##print(f'New {user_role} have joined. {user_role}\'s name is {user_name}')
+		#print("---")
 
 	html = windy.render('create_user.html', **request).encode('utf-8')
 	return [html]

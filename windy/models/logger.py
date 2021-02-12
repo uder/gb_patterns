@@ -8,7 +8,7 @@ class WindyLogger(metaclass=Singleton):
         self.eol="\n"
         self.dir=dir
 
-    def log(self,severity,target,message):
+    def log(self,severity,target="messages",message=""):
         date=datetime.now()
         record=f'{date} {severity}: {message}'
         self.log_to_file(target,record)
