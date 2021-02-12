@@ -73,6 +73,8 @@ def create_category(windy,environ,start_response,request):
 
 def category_list(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
+	list=Category.categories_list()
+	print(list)
 	html=windy.render('category_list.html', **request).encode('utf-8')
 	return [html]
 
