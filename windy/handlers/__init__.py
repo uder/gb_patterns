@@ -1,5 +1,7 @@
 from pprint import pprint
 from windy.models.user import User
+from windy.models.category import Category
+from windy.models.course import Course
 
 def root(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
@@ -26,11 +28,25 @@ def feedback(windy,environ,start_response,request):
 
 def create_course(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
+	if request['method']=='POST':
+		name=request['data'].get('course_name', "NO_CRS_PATCH")
+		duration=request['data'].get('course_duration',"100h")
+
+		course=Course(name,duration)
+		windy.logger.log('INFO', "learning", repr(course))
+
 	html=windy.render('create_course.html', **request).encode('utf-8')
 	return [html]
 
 def create_category(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
+	if request['method']=='POST':
+		name=request['data'].get('category_name', "NO_CAT_PATCH")
+		desc=request['data'].get('category_desc',"No description")
+
+		category=Category(name,desc)
+		windy.logger.log('INFO', "learning", repr(category))
+
 	html=windy.render('create_category.html', **request).encode('utf-8')
 	return [html]
 
