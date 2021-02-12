@@ -16,6 +16,10 @@
 		"handler":	"create_course"
 	},
 	{
+		"path":		"/copy-course/",
+		"handler":	"copy_course"
+	},
+	{
 		"path": 	"/create-category/",
 		"handler": 	"create_category"
 	},

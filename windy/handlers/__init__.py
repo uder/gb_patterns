@@ -38,6 +38,27 @@ def create_course(windy,environ,start_response,request):
 	html=windy.render('create_course.html', **request).encode('utf-8')
 	return [html]
 
+def copy_course(windy,environ,start_response,request):
+	start_response(windy.http_200, windy.response_headers)
+	if request['method']=='POST':
+		name=request['data'].get('course_name', "NO_CRS_PATCH")
+		copy_from=request['data'].get('course_copy_from',"NO_CRS_PATCH")
+
+		source_course=Course.get_course_by_name(copy_from)
+		if source_course:
+			course=source_course.clone()
+			if course.set_name(name):
+				windy.logger.log('INFO', "learning", repr(course))
+			else:
+				windy.logger.log('ERROR', "learning", f'Cant set name  {name}')
+		else:
+			windy.logger.log('ERROR', "learning", f'No such course {copy_from}')
+
+
+
+	html=windy.render('copy_course.html', **request).encode('utf-8')
+	return [html]
+
 def create_category(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
 	if request['method']=='POST':
