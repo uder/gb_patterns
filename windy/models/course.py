@@ -8,6 +8,11 @@ class Course(PrototypeMixin):
         course=self.courses.get(name,None)
         return course
 
+    @classmethod
+    def get_courses_list(self):
+        list=self.courses.keys()
+        return list
+
     def __init__(self,name,duration):
         self.name=name
         self.duration=duration
@@ -20,6 +25,7 @@ class Course(PrototypeMixin):
     def set_name(self, name):
         if not self.courses.get(name, None):
             self.name=name
+            self.courses.update({self.name:self})
             result=True
         else:
             result=False

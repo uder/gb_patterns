@@ -5,6 +5,9 @@ from windy.models.course import Course
 
 def root(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
+	courses_list=Course.get_courses_list()
+	request.update({'courses_list':courses_list})
+
 	html=windy.render('index.html', **request).encode('utf-8')
 	return [html]
 	

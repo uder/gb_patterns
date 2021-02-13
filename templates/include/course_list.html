@@ -1,13 +1,8 @@
 <br>
 <h3>Здесь будет список курсов</h3>
 <ul>
-    <li>
-        1. Певрвый курс
-    </li>
-    <li>
-        2. Второй курс
-    </li>
-    <li>
-        3. итд
-    </li>
+    {% for course in courses_list %}
+    <li>{{ course }}</li>
+    {% endfor %}
+
 </ul>
