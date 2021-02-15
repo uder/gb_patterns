@@ -1,9 +1,12 @@
 def add_route(url):
-    def decorator(view):
-        def wrapper(windy,environ,start_response,request):
-            windy.routes.append({"path": url, "handler": view.__name__})
-            result=view(windy,environ,start_response,request)
-            return result
+    def inner(view):
+       print(f"decorator {url}")
+       routes.append({"path": url, "handler": func})
 
-        return wrapper
-    return decorator
+       # def wrapper(windy,environ,start_response,request):
+       #     result=view(windy,environ,start_response,request)
+       #     return result
+
+       # return wrapper
+       return view
+    return inner
