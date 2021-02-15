@@ -3,6 +3,7 @@ from windy.models.user import User
 from windy.models.category import Category
 from windy.models.course import Course
 from windy.decorators.debug import debug
+from windy.decorators.add_route import add_route
 
 @debug
 def root(windy,environ,start_response,request):
@@ -12,7 +13,9 @@ def root(windy,environ,start_response,request):
 
 	html=windy.render('index.html', **request).encode('utf-8')
 	return [html]
-	
+
+@debug
+@add_route('/test/')
 def about(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
 	html=windy.render('about.html', **request).encode('utf-8')
