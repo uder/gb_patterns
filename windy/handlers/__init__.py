@@ -2,7 +2,9 @@ from pprint import pprint
 from windy.models.user import User
 from windy.models.category import Category
 from windy.models.course import Course
+from windy.decorators.debug import debug
 
+@debug
 def root(windy,environ,start_response,request):
 	start_response(windy.http_200, windy.response_headers)
 	courses_list=Course.get_courses_list()
