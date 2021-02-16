@@ -1,6 +1,7 @@
 from windy.include_patterns.prototype import PrototypeMixin
+from .catalogue import Catalogue
 
-class Course(PrototypeMixin):
+class Course(Catalogue,PrototypeMixin):
     courses={}
 
     @classmethod
@@ -10,14 +11,24 @@ class Course(PrototypeMixin):
 
     @classmethod
     def get_courses_list(self):
-        list=self.courses.keys()
-        return list
+        keys=self.courses.keys()
+        if keys:
+            return keys
+        else:
+            return []
+
+    @classmethod
+    def get_courses(cls):
+        return cls.courses
 
     def __init__(self,name,duration):
         self.name=name
         self.duration=duration
 
         self.courses.update({self.name: self})
+
+    def list_children(self):
+        return []
 
     def __repr__(self):
         return f"Course(Name: {self.name}, Duration: {self.duration})"

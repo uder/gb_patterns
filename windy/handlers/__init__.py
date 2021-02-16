@@ -39,9 +39,15 @@ def create_course(windy,environ,start_response,request):
 	if request['method']=='POST':
 		name=request['data'].get('course_name', "NO_CRS_PATCH")
 		duration=request['data'].get('course_duration',"100h")
+		category_name=request['data'].get('course_category','')
+		category = Category.get_category_by_name(category_name)
+		if category:
+			course = Course(name, duration)
+			category.append(course)
+			windy.logger.log('INFO', "learning", repr(course))
+		else:
+			request['err']="No such category. Try again"
 
-		course=Course(name,duration)
-		windy.logger.log('INFO', "learning", repr(course))
 
 	html=windy.render('create_course.html', **request).encode('utf-8')
 	return [html]
@@ -72,9 +78,16 @@ def create_category(windy,environ,start_response,request):
 	if request['method']=='POST':
 		name=request['data'].get('category_name', "NO_CAT_PATCH")
 		desc=request['data'].get('category_desc',"No description")
+		parent_name=request['data'].get('category_parent','')
+		parent = Category.get_category_by_name(parent_name)
+		if parent or parent_name=="":
+			category = Category(name, desc)
+			if parent_name:
+				parent.append(category)
+			windy.logger.log('INFO', "learning", repr(category))
+		else:
+			request['err']="No such category. Try again"
 
-		category=Category(name,desc)
-		windy.logger.log('INFO', "learning", repr(category))
 
 	html=windy.render('create_category.html', **request).encode('utf-8')
 	return [html]
@@ -93,14 +106,8 @@ def create_user(windy,environ,start_response,request):
 		user_name = request['data'].get('user_name', "Anonymous")
 		user_role = request['data'].get('user_role')
 
-		#user=windy.models.User.create(user_name,user_role)
 		user = User.create(user_name, user_role)
-		#user.say()
 		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
-
-		#print("---")
-		##print(f'New {user_role} have joined. {user_role}\'s name is {user_name}')
-		#print("---")
 
 	html = windy.render('create_user.html', **request).encode('utf-8')
 	return [html]
