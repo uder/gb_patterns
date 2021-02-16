@@ -4,11 +4,15 @@
 {% block body %}
     <h1>Форма добавления категории</h1>
     <form method="post">
+        {{ err }}
         <h3>Добавить категорию</h3>
         <label for="category_name">Название категории:</label><br>
         <input type="text" name="category_name" placeholder="Название"><br>
         <label for="category_desc">Описание категории:</label><br>
         <input type="text" name="category_desc" placeholder="Описание"><br>
+        <label for="category_parent">Родительская категория:</label><br>
+        <input type="text" name="category_parent" placeholder="Название категории"><br>
+
         <input type="submit" value="Отправить">
     </form>
 {% endblock %}

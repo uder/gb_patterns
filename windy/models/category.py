@@ -1,21 +1,57 @@
-class Category():
-    categories=[]
-    categories=['fisrt','second']
+from .catalogue import Catalogue
+
+class Category(Catalogue):
+    categories={}
+    root={}
 
     @classmethod
-    def categories_list(self):
-        return self.categories
+    def list_root(cls):
+        keys=cls.root.keys()
+        if keys:
+            return keys
+        else:
+            return []
+
+    @classmethod
+    def get_category_by_name(cls,name):
+        category=cls.categories.get(name,None)
+        return category
+
+    @classmethod
+    def categories_list(cls):
+        keys=cls.categories.keys()
+        if keys:
+            return keys
+        else:
+            return []
+
+    @classmethod
+    def get_categories(cls):
+        return cls.categories
 
     def __init__(self,name,desc):
         self.name=name
         self.desc=desc
-        self.categories.append(name)
+        self._children=[]
+        self.categories.update({self.name:self})
+
+    def list_children(self):
+        return self._children
+
+    def append(self,object):
+        if isinstance(object,Catalogue):
+            self._children.append(object)
+
+    def remove(self,object):
+        index=self._children.index(object)
+        if index:
+            self._children.remove(index)
+
+    # def set_root(self):
+    #     self.root.update({self.name,self})
 
     def __repr__(self):
         return f"Category(Name: {self.name}, Description: {self.desc})"
-
-
-
 
     def course_count(self):
         pass
