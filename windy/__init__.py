@@ -40,3 +40,18 @@ class Windy():
 		handler=self.get_view(environ['PATH_INFO'])
 		retval=handler(self,environ,start_response,request)
 		return retval
+
+
+class MockWindy(Windy):
+	def __call__(self,environ,start_response):
+		start_response('200 OK', [('Content-Type', 'text/html')])
+		return [b'Hello from Mock']
+
+class DebugWindy(Windy):
+	def __call__(self,environ,start_response):
+		self.logger.log('DEBUG','debug',str(environ))
+		request={}
+		request=middleware.invoke(self,request,environ)
+		handler=self.get_view(environ['PATH_INFO'])
+		retval=handler(self,environ,start_response,request)
+		return retval

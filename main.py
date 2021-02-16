@@ -1,4 +1,6 @@
-from windy import Windy
+from windy import Windy,MockWindy,DebugWindy
 
 application=Windy()
+# application=MockWindy()
+# application=DebugWindy()
 
