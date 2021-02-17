@@ -6,23 +6,18 @@ from windy.decorators.debug import debug
 from windy.router import Router
 
 @debug
-def root(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def root(windy,request):
 	courses_list=Course.get_courses_list()
 	request.update({'courses_list':courses_list})
-
-	html=windy.render('index.html', **request).encode('utf-8')
-	return [html]
-
+	text=windy.render('index.html', **request)
+	return '200', text
 
 @Router.add_route('/test/')
-def about(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
-	html=windy.render('about.html', **request).encode('utf-8')
-	return [html]
+def about(windy,request):
+	text=windy.render('about.html', **request)
+	return '200', text
 
-def feedback(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def feedback(windy,request):
 	if request['method']=='POST':
 		name=request['data'].get('name',"Anonymous")
 		email=request['data'].get('email',"Without Mail")
@@ -31,11 +26,10 @@ def feedback(windy,environ,start_response,request):
 
 		windy.logger.log('INFO', "feedback", f'We have received Feedback from: "{name}" with return mail: "{email}" with subject: "{subject}" and message: "{message}"')
 
-	html=windy.render('feedback.html', **request).encode('utf-8')
-	return [html]
+	text=windy.render('feedback.html', **request)
+	return '200', text
 
-def create_course(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def create_course(windy,request):
 	if request['method']=='POST':
 		name=request['data'].get('course_name', "NO_CRS_PATCH")
 		duration=request['data'].get('course_duration',"100h")
@@ -48,12 +42,12 @@ def create_course(windy,environ,start_response,request):
 		else:
 			request['err']="No such category. Try again"
 
+	text=windy.render('create_course.html', **request)
+	return '200', text
 
-	html=windy.render('create_course.html', **request).encode('utf-8')
-	return [html]
 
-def copy_course(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+
+def copy_course(windy,request):
 	if request['method']=='POST':
 		name=request['data'].get('course_name', "NO_CRS_PATCH")
 		copy_from=request['data'].get('course_copy_from',"NO_CRS_PATCH")
@@ -70,11 +64,10 @@ def copy_course(windy,environ,start_response,request):
 
 
 
-	html=windy.render('copy_course.html', **request).encode('utf-8')
-	return [html]
+	text=windy.render('copy_course.html', **request)
+	return '200', text
 
-def create_category(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def create_category(windy,request):
 	if request['method']=='POST':
 		name=request['data'].get('category_name', "NO_CAT_PATCH")
 		desc=request['data'].get('category_desc',"No description")
@@ -88,20 +81,17 @@ def create_category(windy,environ,start_response,request):
 		else:
 			request['err']="No such category. Try again"
 
+	text=windy.render('create_category.html', **request)
+	return '200', text
 
-	html=windy.render('create_category.html', **request).encode('utf-8')
-	return [html]
-
-def category_list(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def category_list(windy,request):
 	cat_list=Category.categories_list()
 	request.update({'cat_list':cat_list})
 
-	html=windy.render('category_list.html', **request).encode('utf-8')
-	return [html]
+	text=windy.render('category_list.html', **request)
+	return '200', text
 
-def create_user(windy,environ,start_response,request):
-	start_response(windy.http_200, windy.response_headers)
+def create_user(windy,request):
 	if request['method'] == 'POST':
 		user_name = request['data'].get('user_name', "Anonymous")
 		user_role = request['data'].get('user_role')
@@ -109,9 +99,9 @@ def create_user(windy,environ,start_response,request):
 		user = User.create(user_name, user_role)
 		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
 
-	html = windy.render('create_user.html', **request).encode('utf-8')
-	return [html]
+	text = windy.render('create_user.html', **request)
+	return '200', text
 
-def not_found(windy,environ,start_response,request):
-	start_response(windy.http_404, windy.response_headers)
-	return [b'NOT EXISTENT PAGE '+environ['PATH_INFO'].encode('utf-8')]
+def not_found(windy,request):
+	text=f"NOT EXISTENT PAGE"
+	return '404', text

@@ -34,7 +34,7 @@ class Router(metaclass=Singleton):
 
     def _get_view_by_name(self,handler):
         view = self.not_found
-        m = import_module('windy.handlers')
+        m = import_module('windy.views')
         for name, func in getmembers(m, isfunction):
             if name == handler:
                 view = func

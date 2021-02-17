@@ -1,5 +1,5 @@
 import os
-import windy.handlers
+import windy.views
 import windy.middleware
 import windy.templates
 from windy.models.logger import WindyLogger
@@ -22,7 +22,7 @@ class Windy():
 		self.http_200='200 OK'
 		self.http_404='404 NOT FOUND'
 		self.response_headers=[('Content-type', 'text/html')]
-		# self.default=handlers.not_found
+		# self.default=views.not_found
 
 	def load_middleware(self):
 		return middleware.import_functions()
@@ -40,9 +40,10 @@ class Windy():
 	def __call__(self,environ,start_response):
 		request={}
 		request=middleware.invoke(self,request,environ)
-		handler=self.get_view(environ['PATH_INFO'])
-		retval=handler(self,environ,start_response,request)
-		return retval
+		view=self.get_view(environ['PATH_INFO'])
+		code,text=view(self,request)
+		start_response(code, [('Content-Type', 'text/html')])
+		return [text.encode('utf-8')]
 
 
 class MockWindy(Windy):
