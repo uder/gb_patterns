@@ -10,7 +10,9 @@ from pprint import pprint
 
 class Windy():
 	def __init__(self):
-		Router.init_routes()
+		self.router=Router()
+		self.router.init_routes()
+
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
 
@@ -31,7 +33,8 @@ class Windy():
 		return confdir
 		
 	def get_view(self,path):
-		view=Router.get_view(path)
+
+		view=self.router.get_view(path)
 		return view
 
 	def __call__(self,environ,start_response):

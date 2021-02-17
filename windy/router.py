@@ -1,9 +1,10 @@
 import os, json
 from importlib import import_module
 from inspect import getmembers,isfunction
+from windy.include_patterns.singleton import Singleton
 from pprint import pprint
 
-class Router():
+class Router(metaclass=Singleton):
     routes={}
     not_found=None
 
@@ -15,29 +16,29 @@ class Router():
 
         return inner
 
-    @classmethod
-    def init_routes(cls):
+    def __init__(self):
+        self.init_routes()
+
+    def init_routes(self):
         dirname = os.path.dirname(__file__)
         config_file = os.path.join(dirname, "conf/routes.json")
         with open(config_file, "r") as f:
             json_conf = json.load(f)
 
         for item in json_conf:
-            cls.routes.update({item['path']:cls._get_view_by_name(item['handler'])})
+            self.routes.update({item['path']:self._get_view_by_name(item['handler'])})
 
-    @classmethod
-    def get_view(cls,route):
-        view=cls.routes.get(route,cls.not_found)
+    def get_view(self,route):
+        view=self.routes.get(route,self.not_found)
         return view
 
-    @classmethod
-    def _get_view_by_name(cls,handler):
-        view = cls.not_found
+    def _get_view_by_name(self,handler):
+        view = self.not_found
         m = import_module('windy.handlers')
         for name, func in getmembers(m, isfunction):
             if name == handler:
                 view = func
             elif name == 'not_found':
-                cls.not_found=func
+                self.not_found=func
 
         return view
