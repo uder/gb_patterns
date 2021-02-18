@@ -1,6 +1,6 @@
 import os, json
 from importlib import import_module
-from inspect import getmembers,isfunction
+from inspect import getmembers,isfunction,isclass
 from windy.include_patterns.singleton import Singleton
 from pprint import pprint
 
@@ -30,7 +30,11 @@ class Router(metaclass=Singleton):
 
     def get_view(self,route):
         view=self.routes.get(route,self.not_found)
-        return view
+        if isfunction(view):
+            result=view
+        elif isclass(view):
+            result=view()
+        return result
 
     def _get_view_by_name(self,handler):
         view = self.not_found

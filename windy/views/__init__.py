@@ -4,7 +4,17 @@ from windy.models.category import Category
 from windy.models.course import Course
 from windy.decorators.debug import debug
 from windy.router import Router
+from windy.cbv import ListView
 
+@Router.add_route('/test/')
+@debug
+class ListCategory(ListView):
+	template = "category_list.html"
+	def get_context(self):
+		return {'cat_list': Category.categories_list()}
+
+
+@Router.add_route('/debug/')
 @debug
 def root(windy,request):
 	courses_list=Course.get_courses_list()
@@ -12,7 +22,6 @@ def root(windy,request):
 	text=windy.render('index.html', **request)
 	return '200', text
 
-@Router.add_route('/test/')
 def about(windy,request):
 	text=windy.render('about.html', **request)
 	return '200', text
