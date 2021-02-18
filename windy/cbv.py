@@ -23,3 +23,5 @@ class ListView(TemplateView):
         self.context=self.get_context()
         self.code='200 OK'
 
+class CreateView(TemplateView):
+    pass
