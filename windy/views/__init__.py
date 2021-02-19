@@ -4,14 +4,58 @@ from windy.models.category import Category
 from windy.models.course import Course
 from windy.decorators.debug import debug
 from windy.router import Router
-from windy.cbv import ListView
+from windy.cbv import ListView,CreateView
 
-@Router.add_route('/test/')
-@debug
+@Router.add_route('/cat/')
 class ListCategory(ListView):
 	template = "category_list.html"
-	def get_context(self):
-		return {'cat_list': Category.categories_list()}
+	def get_context(self,request):
+		context={}
+		context.update({'cat_list': Category.categories_list()})
+		return context
+
+@Router.add_route('/list/')
+@debug
+class ListCourse(ListView):
+	template = "index.html"
+	def get_context(self,request):
+		context={}
+		context.update({'courses_list': Course.get_courses_list()})
+		return context
+
+@Router.add_route('/test/')
+class CreateCategory(CreateView):
+	template = "create_category.html"
+	def get_context(self,request):
+		if request['method'] == 'POST':
+			name = request['data'].get('category_name', "NO_CAT_PATCH")
+			desc = request['data'].get('category_desc', "No description")
+			parent_name = request['data'].get('category_parent', '')
+			parent = Category.get_category_by_name(parent_name)
+			if parent or parent_name == "":
+				category = Category(name, desc)
+				if parent_name:
+					parent.append(category)
+				# windy.logger.log('INFO', "learning", repr(category))
+			else:
+				request['err'] = "No such category. Try again"
+		return request
+
+class CreateCourse(CreateView):
+	template = "create_course.html"
+	def get_context(self,request):
+		if request['method'] == 'POST':
+			name = request['data'].get('course_name', "NO_CRS_PATCH")
+			duration = request['data'].get('course_duration', "100h")
+			category_name = request['data'].get('course_category', '')
+			category = Category.get_category_by_name(category_name)
+			if category:
+				course = Course(name, duration)
+				category.append(course)
+				# windy.logger.log('INFO', "learning", repr(course))
+			else:
+				request['err'] = "No such category. Try again"
+		return request
 
 
 @Router.add_route('/debug/')

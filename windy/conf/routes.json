@@ -1,7 +1,7 @@
 [
 	{
 		"path":		"/",
-		"handler":	"root"
+		"handler":	"ListCourse"
 	},
 	{
 		"path":		"/about/",
@@ -13,7 +13,7 @@
 	},
 	{
 		"path":		"/create-course/",
-		"handler":	"create_course"
+		"handler":	"CreateCourse"
 	},
 	{
 		"path":		"/copy-course/",
@@ -21,11 +21,11 @@
 	},
 	{
 		"path": 	"/create-category/",
-		"handler": 	"create_category"
+		"handler": 	"CreateCategory"
 	},
 	{
 		"path": 	"/category-list/",
-		"handler": 	"category_list"
+		"handler": 	"ListCategory"
 	},
 		{
 		"path": 	"/create-user/",

@@ -11,17 +11,22 @@ class TemplateView():
         return {}
 
     def __call__(self,windy,request):
-        self.context.update(request)
-        request=self.context
+        self.context=self.get_context(request)
+        # self.context.update(request)
+        # request=self.context
         code=self.code
-        text = render(self.template, **request)
+        text = render(self.template, **self.context)
         return code, text
 
 class ListView(TemplateView):
     template = "list.html"
     def __init__(self):
-        self.context=self.get_context()
+        # self.context=self.get_context(request)
         self.code='200 OK'
 
 class CreateView(TemplateView):
-    pass
+    template = "create.html"
+    def __init__(self):
+        # self.context=self.get_context(request)
+        self.code='200 OK'
+
