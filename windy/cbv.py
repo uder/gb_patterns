@@ -1,5 +1,6 @@
 from pprint import pprint
 from windy.templates import render
+from windy.observer import CreateNotifier,Console
 class TemplateView():
     template = "base.html"
 
@@ -25,8 +26,11 @@ class ListView(TemplateView):
         self.code='200 OK'
 
 class CreateView(TemplateView):
+    console=Console()
+    notifier=CreateNotifier()
     template = "create.html"
     def __init__(self):
         # self.context=self.get_context(request)
         self.code='200 OK'
+        self.notifier.attach(self.console)
 

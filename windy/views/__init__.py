@@ -36,7 +36,7 @@ class CreateCategory(CreateView):
 				category = Category(name, desc)
 				if parent_name:
 					parent.append(category)
-				# windy.logger.log('INFO', "learning", repr(category))
+				self.notifier.text=f'New category - {repr(category)}'
 			else:
 				request['err'] = "No such category. Try again"
 		return request
@@ -52,7 +52,7 @@ class CreateCourse(CreateView):
 			if category:
 				course = Course(name, duration)
 				category.append(course)
-				# windy.logger.log('INFO', "learning", repr(course))
+				self.notifier.text=f'New course - {repr(course)}'
 			else:
 				request['err'] = "No such category. Try again"
 		return request
