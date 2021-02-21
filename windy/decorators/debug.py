@@ -11,6 +11,8 @@ def debug(func):
         elif isclass(func):
             view=func()
             result=view.__call__(*args,**kwargs)
+        else:
+            result = None
         t2=time()
         logger.log("DEBUG",'debug', f'Name: {func.__name__} Time: {t2-t1}')
         return result
