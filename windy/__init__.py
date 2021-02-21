@@ -10,8 +10,7 @@ from pprint import pprint
 
 class Windy():
 	def __init__(self):
-		self.router=Router()
-		self.router.init_routes()
+		self._init_router()
 
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
@@ -22,7 +21,10 @@ class Windy():
 		self.http_200='200 OK'
 		self.http_404='404 NOT FOUND'
 		self.response_headers=[('Content-type', 'text/html')]
-		# self.default=views.not_found
+
+	def _init_router(self):
+		self.router=Router()
+		self.router.init_routes()
 
 	def load_middleware(self):
 		return middleware.import_functions()

@@ -36,7 +36,7 @@ class CreateCategory(CreateView):
 				category = Category(name, desc)
 				if parent_name:
 					parent.append(category)
-				self.notifier.text=f'New category - {repr(category)}'
+				self.notify(f'New category - {repr(category)}')
 			else:
 				request['err'] = "No such category. Try again"
 		return request
@@ -52,7 +52,7 @@ class CreateCourse(CreateView):
 			if category:
 				course = Course(name, duration)
 				category.append(course)
-				self.notifier.text=f'New course - {repr(course)}'
+				self.notify(f'New course - {repr(course)}')
 			else:
 				request['err'] = "No such category. Try again"
 		return request
@@ -114,8 +114,6 @@ def copy_course(windy,request):
 				windy.logger.log('ERROR', "learning", f'Cant set name  {name}')
 		else:
 			windy.logger.log('ERROR', "learning", f'No such course {copy_from}')
-
-
 
 	text=windy.render('copy_course.html', **request)
 	return '200', text
