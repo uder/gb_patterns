@@ -23,6 +23,24 @@ class ListCourse(ListView):
 		context.update({'courses_list': Course.get_courses_list()})
 		return context
 
+@Router.add_route('/create-user/')
+class CreateUser(CreateView):
+	template = "create_user.html"
+	def get_context(self,request):
+		if request['method'] == 'POST':
+			user_name = request['data'].get('user_name', "Anonymous")
+			user_role = request['data'].get('user_role')
+			user_course = request['data'].get('course_add',None)
+			course = Course.get_course_by_name(user_course)
+			if course or user_course is None:
+				user = User.create(user_name, user_role)
+				user.sign(course)
+				self.notify(f'New user {repr(user)}')
+			else:
+				request['err'] = "No such course. Try again"
+		return request
+
+
 @Router.add_route('/test/')
 class CreateCategory(CreateView):
 	template = "create_category.html"
@@ -57,14 +75,37 @@ class CreateCourse(CreateView):
 				request['err'] = "No such category. Try again"
 		return request
 
+class ModifyUser(CreateView):
+	template = "modify_user.html"
+	def get_context(self,request):
+		if request['method'] == 'POST':
+			user_name = request['data'].get('user_name',None)
+			# user_role = request['data'].get('user_role')
+			user_course_add = request['data'].get('course_add',None)
+			user_course_del = request['data'].get('course_del',None)
+			user=User.users.get(user_name,None)
+			course_add=Course.courses.get(user_course_add,None)
+			course_del=Course.courses.get(user_course_del,None)
+			print(course_add)
+			print(course_del)
+			if user:
+				if user_course_add:
+					user.sign(course_add)
+				if user_course_del:
+					user.unsign(course_del)
+				self.notify(f'Modify user {repr(user)}')
+			else:
+				request['err'] = "No such user. Try again"
+		return request
 
-@Router.add_route('/debug/')
-@debug
-def root(windy,request):
-	courses_list=Course.get_courses_list()
-	request.update({'courses_list':courses_list})
-	text=windy.render('index.html', **request)
-	return '200', text
+
+# @Router.add_route('/debug/')
+# @debug
+# def root(windy,request):
+# 	courses_list=Course.get_courses_list()
+# 	request.update({'courses_list':courses_list})
+# 	text=windy.render('index.html', **request)
+# 	return '200', text
 
 def about(windy,request):
 	text=windy.render('about.html', **request)
@@ -82,21 +123,21 @@ def feedback(windy,request):
 	text=windy.render('feedback.html', **request)
 	return '200', text
 
-def create_course(windy,request):
-	if request['method']=='POST':
-		name=request['data'].get('course_name', "NO_CRS_PATCH")
-		duration=request['data'].get('course_duration',"100h")
-		category_name=request['data'].get('course_category','')
-		category = Category.get_category_by_name(category_name)
-		if category:
-			course = Course(name, duration)
-			category.append(course)
-			windy.logger.log('INFO', "learning", repr(course))
-		else:
-			request['err']="No such category. Try again"
-
-	text=windy.render('create_course.html', **request)
-	return '200', text
+# def create_course(windy,request):
+# 	if request['method']=='POST':
+# 		name=request['data'].get('course_name', "NO_CRS_PATCH")
+# 		duration=request['data'].get('course_duration',"100h")
+# 		category_name=request['data'].get('course_category','')
+# 		category = Category.get_category_by_name(category_name)
+# 		if category:
+# 			course = Course(name, duration)
+# 			category.append(course)
+# 			windy.logger.log('INFO', "learning", repr(course))
+# 		else:
+# 			request['err']="No such category. Try again"
+#
+# 	text=windy.render('create_course.html', **request)
+# 	return '200', text
 
 
 
@@ -118,40 +159,40 @@ def copy_course(windy,request):
 	text=windy.render('copy_course.html', **request)
 	return '200', text
 
-def create_category(windy,request):
-	if request['method']=='POST':
-		name=request['data'].get('category_name', "NO_CAT_PATCH")
-		desc=request['data'].get('category_desc',"No description")
-		parent_name=request['data'].get('category_parent','')
-		parent = Category.get_category_by_name(parent_name)
-		if parent or parent_name=="":
-			category = Category(name, desc)
-			if parent_name:
-				parent.append(category)
-			windy.logger.log('INFO', "learning", repr(category))
-		else:
-			request['err']="No such category. Try again"
+# def create_category(windy,request):
+# 	if request['method']=='POST':
+# 		name=request['data'].get('category_name', "NO_CAT_PATCH")
+# 		desc=request['data'].get('category_desc',"No description")
+# 		parent_name=request['data'].get('category_parent','')
+# 		parent = Category.get_category_by_name(parent_name)
+# 		if parent or parent_name=="":
+# 			category = Category(name, desc)
+# 			if parent_name:
+# 				parent.append(category)
+# 			windy.logger.log('INFO', "learning", repr(category))
+# 		else:
+# 			request['err']="No such category. Try again"
+#
+# 	text=windy.render('create_category.html', **request)
+# 	return '200', text
 
-	text=windy.render('create_category.html', **request)
-	return '200', text
+# def category_list(windy,request):
+# 	cat_list=Category.categories_list()
+# 	request.update({'cat_list':cat_list})
+#
+# 	text=windy.render('category_list.html', **request)
+# 	return '200', text
 
-def category_list(windy,request):
-	cat_list=Category.categories_list()
-	request.update({'cat_list':cat_list})
-
-	text=windy.render('category_list.html', **request)
-	return '200', text
-
-def create_user(windy,request):
-	if request['method'] == 'POST':
-		user_name = request['data'].get('user_name', "Anonymous")
-		user_role = request['data'].get('user_role')
-
-		user = User.create(user_name, user_role)
-		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
-
-	text = windy.render('create_user.html', **request)
-	return '200', text
+# def create_user(windy,request):
+# 	if request['method'] == 'POST':
+# 		user_name = request['data'].get('user_name', "Anonymous")
+# 		user_role = request['data'].get('user_role')
+#
+# 		user = User.create(user_name, user_role)
+# 		windy.logger.log('INFO',user_role,f'New user. Name: {user_name} Role: {user_role}')
+#
+# 	text = windy.render('create_user.html', **request)
+# 	return '200', text
 
 def not_found(windy,request):
 	text=f"NOT EXISTENT PAGE"

@@ -27,9 +27,12 @@
 		"path": 	"/category-list/",
 		"handler": 	"ListCategory"
 	},
-		{
+	{
 		"path": 	"/create-user/",
-		"handler": 	"create_user"
+		"handler": 	"CreateUser"
+	},
+	{
+		"path": 	"/modify-user/",
+		"handler": 	"ModifyUser"
 	}
-
 ]
