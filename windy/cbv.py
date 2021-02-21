@@ -8,7 +8,7 @@ class TemplateView():
         self.context={}
         self.code='200 OK'
 
-    def get_context(self):
+    def get_context(self,request):
         return {}
 
     def __call__(self,windy,request):
