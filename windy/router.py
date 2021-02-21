@@ -34,6 +34,8 @@ class Router(metaclass=Singleton):
             result=view
         elif isclass(view):
             result=view()
+        else:
+            result=None
         return result
 
     def _get_view_by_name(self,handler):
