@@ -2,7 +2,7 @@ import os
 import sys
 import pkgutil
 from importlib import import_module
-from inspect import getmembers, isfunction, currentframe
+from inspect import getmembers, isfunction
 from pprint import pprint
 
 
