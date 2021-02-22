@@ -98,7 +98,10 @@ class ModifyCourse(CreateView):
 				if remove_category:
 					remove_category.remove(course)
 
-				self.notify(f'Modify course - {repr(course)}')
+				message=f'Modify course - {repr(course)}'
+				self.notify(message)
+				for user in User.user_list_by_course(course):
+					user.notify(message)
 			else:
 				request['err'] = "No such course. Try again"
 		return request

@@ -1,4 +1,5 @@
 import abc
+from windy.observer import CreateNotifier,Email,Sms
 
 class User():
     users={}
@@ -28,11 +29,33 @@ class User():
         else:
             return []
 
+    @classmethod
+    def user_list_by_course(cls,course):
+        user_list=[]
+        for name, user in cls.users.items():
+            if course in user.get_courses_list():
+                user_list.append(user)
+
+        return user_list
+
     def __init__(self,name):
         self.name=name
+        self._publisher=self.add_publisher()
 
     def __repr__(self):
         return f'User(Name: {self.name} Role: {self.__class__.__name__} Courses: {str(self.get_courses_list())})'
+
+    def add_publisher(self):
+        publisher=CreateNotifier()
+        publisher.attach(Sms())
+        publisher.attach(Email())
+
+        return publisher
+
+    def notify(self,arg):
+        string=f'Dear {self.name}, {arg}'
+        self._publisher.arg=string
+
 
     @abc.abstractmethod
     def sign(self,course):
@@ -44,6 +67,10 @@ class User():
 
     @abc.abstractmethod
     def get_courses_list(self):
+        pass
+
+    @abc.abstractmethod
+    def is_signed_for(self,course):
         pass
 
 class Student(User):
@@ -60,6 +87,14 @@ class Student(User):
     def get_courses_list(self):
         return self._student_courses
 
+    # def is_signed_for(self,course):
+    #     if course in self._student_courses:
+    #         result=True
+    #     else:
+    #         result=False
+    #
+    #     return result
+
     def say(self):
         print (f'Im Student, my name is {self.name}')
 
@@ -74,4 +109,7 @@ class Teacher(User):
         pass
 
     def get_courses_list(self):
+        pass
+
+    def is_signed_for(self,course):
         pass

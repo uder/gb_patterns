@@ -38,6 +38,20 @@ class Console(Observer):
         print(f'{datetime.now().isoformat(" ","seconds")}: {arg}')
         print(self.delimiter)
 
+class Email(Observer):
+    delimiter="---"
+    def update(self, arg):
+        print(self.delimiter)
+        print(f'{datetime.now().isoformat(" ","seconds")}: Email - {arg}')
+        print(self.delimiter)
+
+class Sms(Observer):
+    delimiter="---"
+    def update(self, arg):
+        print(self.delimiter)
+        print(f'{datetime.now().isoformat(" ","seconds")}: Sms - {arg}')
+        print(self.delimiter)
+
 class LogFile(Observer):
     def __init__(self,logfile):
         super().__init__()
