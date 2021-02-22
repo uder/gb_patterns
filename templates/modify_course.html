@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %} Изменить курс {% endblock %}
+
+{% block body %}
+    <h1>Форма изменения курса</h1>
+    <form method="post">
+        {{ err }} <br>
+        <h3>Изменить курс</h3>
+        <label for="course_name">Название курса:</label><br>
+        <input type="text" name="course_name" placeholder="Название"><br>
+        <label for="new_course_name">Новое название курса:</label><br>
+        <input type="text" name="new_course_name" placeholder="Название"><br>
+        <label for="new_cousre_duration">Новая продолжительность:</label><br>
+        <input type="text" name="new_course_duration" placeholder="Продолжительность"><br>
+        <label for="new_cousre_category">Новая категория:</label><br>
+        <input type="text" name="new_course_category" placeholder="Название категории"><br>
+        <label for="remove_cousre_category">Удалить категория:</label><br>
+        <input type="text" name="remove_course_category" placeholder="Название категории"><br>
+        <input type="submit" value="Отправить">
+    </form>
+    <a href="/copy-course/">Скопировать существующий курс</a>
+{% endblock %}

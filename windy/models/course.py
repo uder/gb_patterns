@@ -24,7 +24,7 @@ class Course(Catalogue,PrototypeMixin):
     def __init__(self,name,duration):
         self.name=name
         self.duration=duration
-
+        # self._category=None
         self.courses.update({self.name: self})
 
     def list_children(self):
@@ -42,6 +42,16 @@ class Course(Catalogue,PrototypeMixin):
             result=False
 
         return result
+
+    # def set_category(self,category):
+    #     if isinstance(Catalogue,category):
+    #         self._category=category
+    #         return True
+    #     else:
+    #         return False
+
+    def set_duration(self,duration):
+        self.duration=duration
 
     def student_count(self):
         pass

@@ -75,6 +75,34 @@ class CreateCourse(CreateView):
 				request['err'] = "No such category. Try again"
 		return request
 
+class ModifyCourse(CreateView):
+	template = "modify_course.html"
+	def get_context(self,request):
+		if request['method'] == 'POST':
+			name = request['data'].get('course_name', None)
+			new_name = request['data'].get('new_course_name', None)
+			new_duration = request['data'].get('new_course_duration', None)
+			new_category_name = request['data'].get('new_course_category', None)
+			remove_category_name = request['data'].get('remove_course_category', None)
+			course = Course.get_course_by_name(name)
+			new_category = Category.get_category_by_name(new_category_name)
+			remove_category = Category.get_category_by_name(remove_category_name)
+			if course:
+				if new_name:
+					if not course.set_name(new_name):
+						request['err'] = f"Course {new_name} already exists. Try again"
+				if new_duration:
+					course.set_duration(new_duration)
+				if new_category:
+					new_category.append(course)
+				if remove_category:
+					remove_category.remove(course)
+
+				self.notify(f'Modify course - {repr(course)}')
+			else:
+				request['err'] = "No such course. Try again"
+		return request
+
 class ModifyUser(CreateView):
 	template = "modify_user.html"
 	def get_context(self,request):
@@ -86,8 +114,6 @@ class ModifyUser(CreateView):
 			user=User.users.get(user_name,None)
 			course_add=Course.courses.get(user_course_add,None)
 			course_del=Course.courses.get(user_course_del,None)
-			print(course_add)
-			print(course_del)
 			if user:
 				if user_course_add:
 					user.sign(course_add)

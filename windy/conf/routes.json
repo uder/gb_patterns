@@ -34,5 +34,9 @@
 	{
 		"path": 	"/modify-user/",
 		"handler": 	"ModifyUser"
+	},
+	{
+		"path": 	"/modify-course/",
+		"handler": 	"ModifyCourse"
 	}
 ]
