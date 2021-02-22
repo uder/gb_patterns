@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} Изменить пользователя {% endblock %}
+
+{% block body %}
+    <h1>Форма изменения пользователя</h1>
+    <form method="post">
+        <h3>Изменить пользователя</h3>
+        {{ err }}<br>
+        <label for="user_name">Имя:</label><br>
+        <input type="text" name="user_name" placeholder="Имя"><br>
+        <label for="course_add">Добавить курс:</label><br>
+        <input type="course_add" name="course_add" placeholder="Курс"><br>
+        <label for="course_del">Удалить курс:</label><br>
+        <input type="course_del" name="course_del" placeholder="Курс"><br>
+
+        <input type="submit" value="Отправить">
+    </form>
+{% endblock %}

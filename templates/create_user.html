@@ -5,6 +5,7 @@
     <h1>Форма добавления пользователя</h1>
     <form method="post">
         <h3>Создать пользователя</h3>
+        {{ err }}<br>
         <label for="user_name">Имя:</label><br>
         <input type="text" name="user_name" placeholder="Имя"><br>
         <label for="user_role">Роль пользователя:</label><br>
@@ -12,6 +13,9 @@
         <label for="student">Студент</label><br>
         <input type="radio" name="user_role" value="teacher" id="teacher">
         <label for="teacher">Преподаватель</label><br>
+        <label for="course_add">Добавить курс:</label><br>
+        <input type="course_add" name="course_add" placeholder="Курс"><br>
         <input type="submit" value="Отправить">
+
     </form>
 {% endblock %}
