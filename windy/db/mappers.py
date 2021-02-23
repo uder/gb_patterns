@@ -1,11 +1,55 @@
-import windy.db.mappers.mapper
-import windy.models.category
+import abc
+import sqlite3
+# import windy.models.catalogue
 from windy.db.errors import DbRecordNotFoundException,DbCommitException,DbUpdateException,DbDeleteException
+from windy.models.catalogue import Category
 
-class CategoryMapper(windy.db.mappers.mapper.Mapper):
+class Mapper(metaclass=abc.ABCMeta):
+    # mappers={
+    #     windy.models.catalogue.Category: CategoryMapper
+    # }
+    mappers={}
+    @classmethod
+    def register_mappers(cls):
+        for subc in cls.__subclasses__():
+            cls.mappers.update({subc.mappers_key:subc})
+
+    @classmethod
+    def get_mapper(cls,obj):
+        mapper=cls.mappers.get(obj.__class__,None)
+        return mapper
+
+    def __init__(self,connection):
+        self.register_mappers()
+        self.connection = connection
+        self.connection.row_factory=sqlite3.Row
+        self.cursor = connection.cursor()
+
+    @abc.abstractmethod
+    def load_from_db(self):
+        pass
+
+    @abc.abstractmethod
+    def get_by_id(self,id):
+        pass
+
+    @abc.abstractmethod
+    def insert(self,object):
+        pass
+
+    @abc.abstractmethod
+    def update(self,object):
+        pass
+
+    @abc.abstractmethod
+    def delete(self,object):
+        pass
+
+class CategoryMapper(Mapper):
     def __init__(self, connection):
         super().__init__(connection)
         self.table = 'category'
+        self.mappers_key=Category
 
     def load_from_db(self):
         sql_query=f"SELECT * FROM {self.table};"
@@ -16,7 +60,7 @@ class CategoryMapper(windy.db.mappers.mapper.Mapper):
             name=row['name']
             desc=row['desc']
             # id, catid, name, description = row
-            category=windy.models.category.Category(name,desc)
+            category=Category(name,desc)
             category.set_catid(catid)
             result.append(category)
         return result
@@ -26,7 +70,7 @@ class CategoryMapper(windy.db.mappers.mapper.Mapper):
         self.cursor.execute(sql_query)
         row=self.cursor.fetchone()
         if row:
-            result=windy.models.category.Category(row['name'],row['desc'])
+            result=Category(row['name'],row['desc'])
             result.set_catid(catid)
             return result
         else:

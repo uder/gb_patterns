@@ -1,10 +1,10 @@
 import os, json
 from importlib import import_module
 from inspect import getmembers,isfunction,isclass
-from windy.include_patterns.singleton import Singleton
+import windy.include_patterns.singleton
 from pprint import pprint
 
-class Router(metaclass=Singleton):
+class Router(metaclass=windy.include_patterns.singleton.Singleton):
     routes={}
     not_found=None
 

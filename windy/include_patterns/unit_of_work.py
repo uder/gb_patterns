@@ -1,4 +1,4 @@
-import windy.db.mappers.mapper
+# import windy.db.mappers
 
 class UnitOfWork():
     _current=None
@@ -26,21 +26,21 @@ class UnitOfWork():
         self.remove_objects.append(obj)
 
     def insert_new(self):
-        Mapper=windy.db.mappers.mapper.Mapper
+        from windy.db.mappers import Mapper
         for obj in self.new_objects:
             mapper=Mapper.mappers.get(obj.__class__,None)
             if mapper:
                 mapper.insert(obj)
 
     def update_dirty(self):
-        Mapper=windy.db.mappers.mapper.Mapper
+        from windy.db.mappers import Mapper
         for obj in self.dirty_objects:
             mapper=Mapper.mappers.get(obj.__class__,None)
             if mapper:
                 mapper.update(obj)
 
     def delete_remove(self):
-        Mapper=windy.db.mappers.mapper.Mapper
+        from windy.db.mappers import Mapper
         for obj in self.remove_objects:
             mapper=Mapper.mappers.get(obj.__class__,None)
             if mapper:
