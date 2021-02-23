@@ -3,6 +3,9 @@ import windy.views
 import windy.middleware
 import windy.templates
 from windy.models.logger import WindyLogger
+from windy.db.connection import create_connection
+from windy.db.schema import DbInit
+from windy.include_patterns.unit_of_work import UnitOfWork
 
 from .router import Router
 
@@ -11,6 +14,13 @@ from pprint import pprint
 class Windy():
 	def __init__(self):
 		self._init_router()
+		self.drop_if_exists=True
+		self.connection=create_connection()
+		self._init_db()
+
+		UnitOfWork.set_current()
+		self.unit_of_work=UnitOfWork.get_current()
+
 
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
@@ -21,6 +31,12 @@ class Windy():
 		self.http_200='200 OK'
 		self.http_404='404 NOT FOUND'
 		self.response_headers=[('Content-type', 'text/html')]
+
+	def _init_db(self):
+		dbinit=DbInit(self.connection,self.drop_if_exists)
+		dbinit.create_tables()
+
+		return dbinit
 
 	def _init_router(self):
 		self.router=Router()

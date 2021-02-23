@@ -1,3 +1,4 @@
+import windy.db
 from pprint import pprint
 from windy.models.user import User
 from windy.models.category import Category
@@ -5,6 +6,7 @@ from windy.models.course import Course
 from windy.decorators.debug import debug
 from windy.router import Router
 from windy.cbv import ListView,CreateView
+from windy.include_patterns.unit_of_work import UnitOfWork
 
 @Router.add_route('/cat/')
 class ListCategory(ListView):
@@ -52,6 +54,8 @@ class CreateCategory(CreateView):
 			parent = Category.get_category_by_name(parent_name)
 			if parent or parent_name == "":
 				category = Category(name, desc)
+				category.mark_new()
+				UnitOfWork.get_current().commit()
 				if parent_name:
 					parent.append(category)
 				self.notify(f'New category - {repr(category)}')
