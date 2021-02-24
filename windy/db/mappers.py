@@ -6,13 +6,13 @@ from windy.models.catalogue import Category
 
 class Mapper(metaclass=abc.ABCMeta):
     # mappers={
-    #     windy.models.catalogue.Category: CategoryMapper
+    #     Category: CategoryMapper
     # }
     mappers={}
     @classmethod
     def register_mappers(cls):
         for subc in cls.__subclasses__():
-            cls.mappers.update({subc.mappers_key:subc})
+            cls.mappers.update({subc.mappers_key():subc})
 
     @classmethod
     def get_mapper(cls,obj):
@@ -45,11 +45,18 @@ class Mapper(metaclass=abc.ABCMeta):
     def delete(self,object):
         pass
 
+    @property
+    def mappers_key(self):
+        return None
+
 class CategoryMapper(Mapper):
     def __init__(self, connection):
         super().__init__(connection)
         self.table = 'category'
-        self.mappers_key=Category
+
+    @classmethod
+    def mappers_key(cls):
+        return Category
 
     def load_from_db(self):
         sql_query=f"SELECT * FROM {self.table};"
@@ -77,8 +84,9 @@ class CategoryMapper(Mapper):
             raise DbRecordNotFoundException(f'table={self.table}; catid={catid}')
 
     def insert(self,category):
+    # def insert(self):
         tups=category.get_tuples()
-        sql_query=f"INSERT INTO {self.table} ({tups[0]}) VALUES ({tups[1]});"
+        sql_query=f"INSERT INTO {self.table} {tups[0]} VALUES {tups[1]};"
         self.cursor.execute(sql_query)
         try:
             self.connection.commit()

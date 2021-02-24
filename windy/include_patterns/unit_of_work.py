@@ -2,6 +2,8 @@
 
 class UnitOfWork():
     _current=None
+    _mapper=None
+    _connection=None
 
     @classmethod
     def set_current(cls):
@@ -9,6 +11,11 @@ class UnitOfWork():
 
     @classmethod
     def get_current(cls):
+        from windy.db.mappers import Mapper
+        from windy.db.connection import create_connection
+        cls._mapper=Mapper
+        cls._mapper.register_mappers()
+        cls._connection=create_connection()
         return cls._current
 
     def __init__(self):
@@ -26,23 +33,20 @@ class UnitOfWork():
         self.remove_objects.append(obj)
 
     def insert_new(self):
-        from windy.db.mappers import Mapper
         for obj in self.new_objects:
-            mapper=Mapper.mappers.get(obj.__class__,None)
+            mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.insert(obj)
 
     def update_dirty(self):
-        from windy.db.mappers import Mapper
         for obj in self.dirty_objects:
-            mapper=Mapper.mappers.get(obj.__class__,None)
+            mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.update(obj)
 
     def delete_remove(self):
-        from windy.db.mappers import Mapper
         for obj in self.remove_objects:
-            mapper=Mapper.mappers.get(obj.__class__,None)
+            mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.delete(obj)
 

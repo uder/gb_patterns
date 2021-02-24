@@ -8,7 +8,7 @@ class Catalogue(windy.include_patterns.mark_mixin.MarkMixin, metaclass=abc.ABCMe
         pass
 
 class Category(Catalogue):
-    # auto_catid=0
+    auto_catid=0
     categories={}
     root={}
 
@@ -54,8 +54,9 @@ class Category(Catalogue):
         self.categories.update({self.name:self})
 
     def auto_catid(self):
-        catid=self.catid
-        self.catid+=1
+        self.auto_catid=self.get_last_catid()
+        catid=self.auto_catid
+        self.auto_catid+=1
         return catid
 
     def set_catid(self,catid):
@@ -71,7 +72,7 @@ class Category(Catalogue):
     def get_tuples(self):
         keys_list=[]
         values_list=[]
-        for k,v in self.get_dict():
+        for k,v in self.get_dict().items():
             keys_list.append(k)
             values_list.append(v)
         result=[]
@@ -97,7 +98,7 @@ class Category(Catalogue):
     #     self.root.update({self.name,self})
 
     def __repr__(self):
-        return f"Category(Name: {self.name}, Description: {self.desc})"
+        return f"Category(CatID: {self.catid} Name: {self.name}, Description: {self.desc})"
 
     def course_count(self):
         pass
