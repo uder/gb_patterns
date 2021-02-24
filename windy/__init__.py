@@ -21,11 +21,11 @@ class Windy():
 		self.connection=windy.db.connection.create_connection()
 		self.mapper=self._init_mapper()
 		self._init_db()
-		self._load_from_db()
 
-		windy.include_patterns.unit_of_work.UnitOfWork.set_current()
+		windy.include_patterns.unit_of_work.UnitOfWork.set_current(self.mapper,self.connection)
 		self.unit_of_work=windy.include_patterns.unit_of_work.UnitOfWork.get_current()
 
+		self._load_from_db()
 
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
@@ -49,13 +49,13 @@ class Windy():
 
 	def _init_mapper(self):
 		mapper=windy.db.mappers.Mapper
+		mapper.register_mappers()
 		return mapper
 
 	def _load_from_db(self):
 		for mapperclass in self.mapper.mappers.values():
 			mapper=mapperclass(self.connection)
 			mapper.load_from_db()
-
 
 	def load_middleware(self):
 		return middleware.import_functions()

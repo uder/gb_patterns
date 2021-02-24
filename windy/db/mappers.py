@@ -63,6 +63,7 @@ class CategoryMapper(Mapper):
         self.cursor.execute(sql_query)
         result=[]
         for row in self.cursor.fetchall():
+            print(row)
             catid=row['catid']
             name=row['name']
             desc=row['desc']

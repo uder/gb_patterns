@@ -1,21 +1,16 @@
-# import windy.db.mappers
-
 class UnitOfWork():
     _current=None
     _mapper=None
     _connection=None
 
     @classmethod
-    def set_current(cls):
+    def set_current(cls,mapper,connection):
+        cls._mapper=mapper
+        cls._connection=connection
         cls._current=cls()
 
     @classmethod
     def get_current(cls):
-        from windy.db.mappers import Mapper
-        from windy.db.connection import create_connection
-        cls._mapper=Mapper
-        cls._mapper.register_mappers()
-        cls._connection=create_connection()
         return cls._current
 
     def __init__(self):

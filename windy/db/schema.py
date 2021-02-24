@@ -28,8 +28,8 @@ class CategoryTable(Table):
     def create(self, drop_if_exists=False):
         if drop_if_exists:
             self.drop()
-        else:
-            raise DbCreateTableException(self.table)
+        # else:
+        #     raise DbCreateTableException(self.table)
         sql_query=f"""CREATE TABLE IF NOT EXISTS {self.table} (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
                         catid INTEGER NOT NULL UNIQUE,
