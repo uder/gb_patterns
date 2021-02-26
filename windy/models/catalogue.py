@@ -2,65 +2,77 @@ import abc
 import windy.include_patterns.mark_mixin
 from windy.include_patterns.prototype import PrototypeMixin
 
+
 class Catalogue(windy.include_patterns.mark_mixin.MarkMixin, metaclass=abc.ABCMeta):
+    def __init__(self,name):
+        from windy.include_patterns.identity_map import IdentityMap
+        self.name=name
+        self.identitymap=IdentityMap()
+
     @abc.abstractmethod
     def list_children(self):
         pass
 
 class Category(Catalogue):
-    auto_catid=0
-    categories={}
-    root={}
+    # categories={}
+    # root={}
 
-    @classmethod
-    def get_last_catid(cls):
-        last_catid=0
-        for category in cls.categories.values():
-            if category.catid>last_catid:
-                last_catid=category.catid+1
+    # @classmethod
+    # def list_root(cls):
+    #     keys=cls.root.keys()
+    #     if keys:
+    #         return keys
+    #     else:
+    #         return []
+
+    # @classmethod
+    # def get_category_by_name(cls,name):
+    #     category=cls.categories.get(name,None)
+    #     return category
+
+    # @classmethod
+    # def categories_list(cls):
+    #     keys=cls.categories.keys()
+    #     if keys:
+    #         return keys
+    #     else:
+    #         return []
+
+    # @classmethod
+    # def get_categories(cls):
+    #     return cls.categories
+
+    def __init__(self,name,desc,catid=None):
+        super().__init__(name)
+        if catid is None:
+            self.catid = self.auto_set_catid()
+        else:
+            if not self.identitymap.get(self.__class__,catid):
+                self.catid=catid
+            else:
+                raise f"Error catalogue object with {catid} already exists"
+
+        # self.name=name
+        self.desc=desc
+        self._children=[]
+        self.identitymap.set(self.catid,self)
+        # self.categories.update({self.name:self})
+
+    def get_last_catid(self):
+        ids=self.identitymap.get_all_ids(self.__class__)
+        if ids:
+            last_catid=max(ids)
+        else:
+            last_catid=0
 
         return last_catid
 
-    @classmethod
-    def list_root(cls):
-        keys=cls.root.keys()
-        if keys:
-            return keys
-        else:
-            return []
-
-    @classmethod
-    def get_category_by_name(cls,name):
-        category=cls.categories.get(name,None)
-        return category
-
-    @classmethod
-    def categories_list(cls):
-        keys=cls.categories.keys()
-        if keys:
-            return keys
-        else:
-            return []
-
-    @classmethod
-    def get_categories(cls):
-        return cls.categories
-
-    def __init__(self,name,desc):
-        self.catid=self.auto_catid()
-        self.name=name
-        self.desc=desc
-        self._children=[]
-        self.categories.update({self.name:self})
-
-    def auto_catid(self):
-        self.auto_catid=self.get_last_catid()
-        catid=self.auto_catid
-        self.auto_catid+=1
+    def auto_set_catid(self):
+        catid=self.get_last_catid()+1
         return catid
 
-    def set_catid(self,catid):
-        self.catid=catid
+    # def set_catid(self,catid):
+    #     self.catid=catid
 
     def get_dict(self):
         result={}
@@ -125,7 +137,8 @@ class Course(Catalogue,PrototypeMixin):
         return cls.courses
 
     def __init__(self,name,duration):
-        self.name=name
+        super().__init__(name)
+        # self.name=name
         self.duration=duration
         # self._category=None
         self.courses.update({self.name: self})

@@ -2,9 +2,11 @@ import abc
 import sqlite3
 # import windy.models.catalogue
 from windy.db.errors import DbRecordNotFoundException,DbCommitException,DbUpdateException,DbDeleteException
-from windy.models.catalogue import Category
+from windy.models.catalogue import Category,Catalogue
+from windy.include_patterns.singleton import Singleton
+from windy.include_patterns.identity_map import IdentityMap
 
-class Mapper(metaclass=abc.ABCMeta):
+class Mapper(metaclass=Singleton):
     # mappers={
     #     Category: CategoryMapper
     # }
@@ -24,6 +26,7 @@ class Mapper(metaclass=abc.ABCMeta):
         self.connection = connection
         self.connection.row_factory=sqlite3.Row
         self.cursor = connection.cursor()
+        self.identitymap=IdentityMap()
 
     @abc.abstractmethod
     def load_from_db(self):
@@ -63,26 +66,37 @@ class CategoryMapper(Mapper):
         self.cursor.execute(sql_query)
         result=[]
         for row in self.cursor.fetchall():
-            print(row)
+            # print(row)
             catid=row['catid']
             name=row['name']
             desc=row['desc']
             # id, catid, name, description = row
-            category=Category(name,desc)
-            category.set_catid(catid)
+
+            category=self.identitymap.get(Category,catid)
+            if not category:
+                print(catid,name)
+                category=Category(name,desc,catid=catid)
+                print(category)
+                # category.set_catid(catid)
+                # self.identitymap.set(catid, category)
             result.append(category)
+            print(result)
         return result
 
     def get_by_id(self,catid):
         sql_query=f"SELECT * FROM {self.table} WHERE catid={catid};"
-        self.cursor.execute(sql_query)
-        row=self.cursor.fetchone()
-        if row:
-            result=Category(row['name'],row['desc'])
-            result.set_catid(catid)
-            return result
-        else:
-            raise DbRecordNotFoundException(f'table={self.table}; catid={catid}')
+        result=self.identitymap.get(Category,catid)
+        if not result:
+            self.cursor.execute(sql_query)
+            row=self.cursor.fetchone()
+            if row:
+                result=Category(row['name'],row['desc'])
+                result.set_catid(catid)
+                self.identitymap.set(catid, result)
+            else:
+                raise DbRecordNotFoundException(f'table={self.table}; catid={catid}')
+
+        return result
 
     def insert(self,category):
     # def insert(self):

@@ -9,7 +9,7 @@ import windy.db
 # from windy.include_patterns.unit_of_work import UnitOfWork
 import windy.include_patterns.unit_of_work
 import windy.db.mappers
-
+from windy.include_patterns.identity_map import IdentityMap
 from .router import Router
 
 from pprint import pprint
@@ -25,7 +25,11 @@ class Windy():
 		windy.include_patterns.unit_of_work.UnitOfWork.set_current(self.mapper,self.connection)
 		self.unit_of_work=windy.include_patterns.unit_of_work.UnitOfWork.get_current()
 
+		self.identitymap=IdentityMap()
+
 		self._load_from_db()
+		pprint(self.identitymap.identities)
+
 
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
