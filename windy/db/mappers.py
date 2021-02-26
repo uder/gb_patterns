@@ -1,6 +1,5 @@
 import abc
 import sqlite3
-# import windy.models.catalogue
 from windy.db.errors import DbRecordNotFoundException,DbCommitException,DbUpdateException,DbDeleteException
 from windy.models.catalogue import Category,Catalogue
 from windy.include_patterns.singleton import Singleton
@@ -91,7 +90,6 @@ class CategoryMapper(Mapper):
             child=self.identitymap.get(Category,child_id)
             category.append(child)
 
-
     def get_by_id(self,catid):
         sql_query=f"SELECT * FROM {self.table} WHERE catid={catid};"
         result=self.identitymap.get(Category,catid)
@@ -108,7 +106,6 @@ class CategoryMapper(Mapper):
         return result
 
     def insert(self,category):
-    # def insert(self):
         tups=category.get_tuples()
         sql_query=f"INSERT INTO {self.table} {tups[0]} VALUES {tups[1]};"
         self.cursor.execute(sql_query)
@@ -119,20 +116,6 @@ class CategoryMapper(Mapper):
             self.connection.commit()
         except Exception as err:
             raise DbCommitException(err.args)
-
-    # def _insert_children(self,category):
-    #     for child in category.list_children():
-    #         sql_select=f"SELECT * FROM {self.children_table} WHERE catid={category.catid} and child_id={child.catid};"
-    #         self.cursor.execute(sql_select)
-    #         if not self.cursor.fetchall():
-    #             sql_query= f"INSERT INTO {self.children_table} (catid, child_id) VALUES ({category.catid},{child.catid});"
-    #             print(sql_query)
-    #             self.cursor.execute(sql_query)
-    #         # print("Ok child rquest")
-    #     try:
-    #         self.connection.commit()
-    #     except Exception as err:
-    #         raise DbCommitException(err.args)
 
     def _get_diff_child_sets(self,category):
         catalogue_links_db=set()
@@ -183,7 +166,15 @@ class CategoryMapper(Mapper):
     def delete(self,category):
         sql_query=f"DELETE FROM {self.table} WHERE catid={category.catid}"
         self.cursor.execute(sql_query)
+
+        sql_query=f"SELECT * FROM {self.children_table} WHERE catid={category.catid}"
+        links_to_delete=self.cursor.execute(sql_query)
+        self._child_links_delete(links_to_delete)
+
         try:
             self.connection.commit()
         except Exception as err:
             raise DbDeleteException(err.args)
+
+    def _check_orphan(self):
+        pass
