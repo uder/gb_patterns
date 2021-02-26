@@ -17,7 +17,7 @@ from pprint import pprint
 class Windy():
 	def __init__(self):
 		self._init_router()
-		self.drop_if_exists=True
+		self.drop_if_exists=False
 		self.connection=windy.db.connection.create_connection()
 		self.mapper=self._init_mapper()
 		self._init_db()

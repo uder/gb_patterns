@@ -6,6 +6,8 @@ from windy.models.catalogue import Category,Catalogue
 from windy.include_patterns.singleton import Singleton
 from windy.include_patterns.identity_map import IdentityMap
 
+from pprint import pprint
+
 class Mapper(metaclass=Singleton):
     # mappers={
     #     Category: CategoryMapper
@@ -71,12 +73,11 @@ class CategoryMapper(Mapper):
             name=row['name']
             desc=row['desc']
 
-
-
             category=self.identitymap.get(Category,catid)
             if not category:
                 category=Category(name,desc,catid=catid)
             result.append(category)
+        self._get_childs_from_db(catid)
         return result
 
     def _get_childs_from_db(self,catid):
@@ -86,6 +87,9 @@ class CategoryMapper(Mapper):
             catid=row['catid']
             child_id=row['child_id']
 
+            category=self.identitymap.get(Category,catid)
+            child=self.identitymap.get(Category,child_id)
+            category.append(child)
 
 
     def get_by_id(self,catid):
@@ -108,22 +112,59 @@ class CategoryMapper(Mapper):
         tups=category.get_tuples()
         sql_query=f"INSERT INTO {self.table} {tups[0]} VALUES {tups[1]};"
         self.cursor.execute(sql_query)
-        try:
-            self.connection.commit()
-        except Exception as err:
-            raise DbCommitException(err.args)
-
-    def _insert_children(self,category):
         for child in category.list_children():
-            sql_query= f"INSERT INTO {self.children_table} (catid, child_id) VALUES ({category.catid},{child.catid});"
-            print(sql_query)
+            sql_query=f"INSERT INTO {self.children_table} (catid,child_id) VALUES ({category.catid},{child.catid});"
             self.cursor.execute(sql_query)
-            # print("Ok child rquest")
         try:
             self.connection.commit()
         except Exception as err:
             raise DbCommitException(err.args)
 
+    # def _insert_children(self,category):
+    #     for child in category.list_children():
+    #         sql_select=f"SELECT * FROM {self.children_table} WHERE catid={category.catid} and child_id={child.catid};"
+    #         self.cursor.execute(sql_select)
+    #         if not self.cursor.fetchall():
+    #             sql_query= f"INSERT INTO {self.children_table} (catid, child_id) VALUES ({category.catid},{child.catid});"
+    #             print(sql_query)
+    #             self.cursor.execute(sql_query)
+    #         # print("Ok child rquest")
+    #     try:
+    #         self.connection.commit()
+    #     except Exception as err:
+    #         raise DbCommitException(err.args)
+
+    def _get_diff_child_sets(self,category):
+        catalogue_links_db=set()
+        select_sql=f"SELECT catid, child_id FROM {self.children_table} WHERE catid={category.catid};"
+        self.cursor.execute(select_sql)
+        for row in self.cursor.fetchall():
+            catalogue_links_db.add((row['catid'],row['child_id']))
+
+        catalogue_links_obj=set()
+        for obj in category.list_children():
+            catalogue_links_obj.add((category.catid,obj.catid))
+
+        links_to_insert=catalogue_links_obj-catalogue_links_db
+        links_to_delete=catalogue_links_db-catalogue_links_obj
+
+        print(links_to_insert)
+        print(links_to_delete)
+        return links_to_insert,links_to_delete
+
+    def _child_links_insert(self,links_to_insert):
+        for tup in links_to_insert:
+            catid=tup[0]
+            child_id=tup[1]
+            sql_query= f"INSERT INTO {self.children_table} (catid, child_id) VALUES ({catid},{child_id});"
+            self.cursor.execute(sql_query)
+
+    def _child_links_delete(self,links_to_delete):
+        for tup in links_to_delete:
+            catid=tup[0]
+            child_id=tup[1]
+            sql_query=f"DELETE FROM {self.children_table} WHERE catid={catid} AND child_id={child_id}"
+            self.cursor.execute(sql_query)
 
     def update(self,category):
         category_dict=category.get_dict()
@@ -131,7 +172,9 @@ class CategoryMapper(Mapper):
             sql_query=f"UPDATE {self.table} SET {key} = '{value}' WHERE catid={category.catid}"
             # print (sql_query)
             self.cursor.execute(sql_query)
-        self._insert_children(category)
+        link_to_insert,links_to_delete=self._get_diff_child_sets(category)
+        self._child_links_insert(link_to_insert)
+        self._child_links_delete(links_to_delete)
         try:
             self.connection.commit()
         except Exception as err:
