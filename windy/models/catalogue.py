@@ -1,13 +1,14 @@
 import abc
 import windy.include_patterns.mark_mixin
 from windy.include_patterns.prototype import PrototypeMixin
-
+# from windy.include_patterns.unit_of_work import UnitOfWork
 
 class Catalogue(windy.include_patterns.mark_mixin.MarkMixin, metaclass=abc.ABCMeta):
     def __init__(self,name):
         from windy.include_patterns.identity_map import IdentityMap
         self.name=name
         self.identitymap=IdentityMap()
+        # self.unit_of_work=UnitOfWork().get_current()
 
     @abc.abstractmethod
     def list_children(self):
@@ -28,18 +29,23 @@ class Category(Catalogue):
         self._children=[]
         self.identitymap.set(self.catid,self)
 
-    def get_last_catid(self):
-        ids=self.identitymap.get_all_ids(self.__class__)
-        if ids:
-            last_catid=max(ids)
-        else:
-            last_catid=0
-
-        return last_catid
+    # def get_last_catid(self):
+    #     ids=self.identitymap.get_all_ids(self.__class__)
+    #     if ids:
+    #         last_catid=max(ids)
+    #     else:
+    #         last_catid=0
+    #
+    #     return last_catid
 
     def auto_set_catid(self):
-        catid=self.get_last_catid()+1
-        return catid
+        ids=self.identitymap.get_all_ids(self.__class__)
+        if ids:
+            last_catid=max(ids)+1
+        else:
+            last_catid=0
+        # catid=self.get_last_catid()+1
+        return last_catid
 
     def get_dict(self):
         result={}
@@ -67,6 +73,8 @@ class Category(Catalogue):
     def append(self,object):
         if isinstance(object,Catalogue):
             self._children.append(object)
+            self.mark_dirty()
+
 
     def remove(self,object):
         index=self._children.index(object)

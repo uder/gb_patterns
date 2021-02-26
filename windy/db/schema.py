@@ -16,9 +16,13 @@ class Table(metaclass=abc.ABCMeta):
     def create(self,drop_if_exists=False):
         pass
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
+    # def drop(self):
+    #     pass
     def drop(self):
-        pass
+        sql_query=f"""DROP TABLE IF EXISTS {self.table}"""
+        self.cursor.execute(sql_query)
+        self.connection.commit()
 
 class CategoryTable(Table):
     def __init__(self,connection):
@@ -39,10 +43,33 @@ class CategoryTable(Table):
         self.cursor.execute(sql_query)
         self.connection.commit()
 
-    def drop(self):
-        sql_query=f"""DROP TABLE IF EXISTS {self.table}"""
+    # def drop(self):
+    #     sql_query=f"""DROP TABLE IF EXISTS {self.table}"""
+    #     self.cursor.execute(sql_query)
+    #     self.connection.commit()
+
+
+class CatalogueChildren(Table):
+    def __init__(self,connection):
+        super().__init__(connection)
+        self.table='catalogue_children'
+
+    def create(self, drop_if_exists=False):
+        if drop_if_exists:
+            self.drop()
+        sql_query=f"""CREATE TABLE IF NOT EXISTS {self.table} (
+                        catid INTEGER NOT NULL,
+                        child_id INTEGER NOT NULL,
+                        UNIQUE(catid,child_id)
+                    )"""
         self.cursor.execute(sql_query)
         self.connection.commit()
+
+    # def drop(self):
+    #     sql_query=f"""DROP TABLE IF EXISTS {self.table}"""
+    #     self.cursor.execute(sql_query)
+    #     self.connection.commit()
+
 
 class DbInit():
     def __init__(self, connection, drop_if_exsists = False):

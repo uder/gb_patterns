@@ -32,20 +32,26 @@ class UnitOfWork():
             mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.insert(obj)
+                self.new_objects.remove(obj)
 
     def update_dirty(self):
         for obj in self.dirty_objects:
             mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.update(obj)
+                self.dirty_objects.remove(obj)
 
     def delete_remove(self):
         for obj in self.remove_objects:
             mapper=self._mapper.mappers.get(obj.__class__,None)(self._connection)
             if mapper:
                 mapper.delete(obj)
+                self.remove_objects.remove(obj)
 
     def commit(self):
+        print(self.new_objects)
+        print(self.dirty_objects)
+        print(self.remove_objects)
         self.insert_new()
         self.update_dirty()
         self.delete_remove()

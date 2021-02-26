@@ -64,10 +64,10 @@ class CreateCategory(CreateView):
 			if parent or parent_name == "":
 				category = Category(name, desc)
 				category.mark_new()
-				UnitOfWork.get_current().commit()
-				pprint(self._identitymap.identities)
+				# pprint(self._identitymap.identities)
 				if parent_name:
 					parent.append(category)
+				UnitOfWork.get_current().commit()
 				self.notify(f'New category - {repr(category)}')
 			else:
 				request['err'] = "No such category. Try again"
