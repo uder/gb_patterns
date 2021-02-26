@@ -66,21 +66,14 @@ class CategoryMapper(Mapper):
         self.cursor.execute(sql_query)
         result=[]
         for row in self.cursor.fetchall():
-            # print(row)
             catid=row['catid']
             name=row['name']
             desc=row['desc']
-            # id, catid, name, description = row
 
             category=self.identitymap.get(Category,catid)
             if not category:
-                print(catid,name)
                 category=Category(name,desc,catid=catid)
-                print(category)
-                # category.set_catid(catid)
-                # self.identitymap.set(catid, category)
             result.append(category)
-            print(result)
         return result
 
     def get_by_id(self,catid):

@@ -14,34 +14,6 @@ class Catalogue(windy.include_patterns.mark_mixin.MarkMixin, metaclass=abc.ABCMe
         pass
 
 class Category(Catalogue):
-    # categories={}
-    # root={}
-
-    # @classmethod
-    # def list_root(cls):
-    #     keys=cls.root.keys()
-    #     if keys:
-    #         return keys
-    #     else:
-    #         return []
-
-    # @classmethod
-    # def get_category_by_name(cls,name):
-    #     category=cls.categories.get(name,None)
-    #     return category
-
-    # @classmethod
-    # def categories_list(cls):
-    #     keys=cls.categories.keys()
-    #     if keys:
-    #         return keys
-    #     else:
-    #         return []
-
-    # @classmethod
-    # def get_categories(cls):
-    #     return cls.categories
-
     def __init__(self,name,desc,catid=None):
         super().__init__(name)
         if catid is None:
@@ -52,11 +24,9 @@ class Category(Catalogue):
             else:
                 raise f"Error catalogue object with {catid} already exists"
 
-        # self.name=name
         self.desc=desc
         self._children=[]
         self.identitymap.set(self.catid,self)
-        # self.categories.update({self.name:self})
 
     def get_last_catid(self):
         ids=self.identitymap.get_all_ids(self.__class__)
@@ -70,9 +40,6 @@ class Category(Catalogue):
     def auto_set_catid(self):
         catid=self.get_last_catid()+1
         return catid
-
-    # def set_catid(self,catid):
-    #     self.catid=catid
 
     def get_dict(self):
         result={}
@@ -106,9 +73,6 @@ class Category(Catalogue):
         if index:
             self._children.remove(index)
 
-    # def set_root(self):
-    #     self.root.update({self.name,self})
-
     def __repr__(self):
         return f"Category(CatID: {self.catid} Name: {self.name}, Description: {self.desc})"
 
@@ -138,9 +102,7 @@ class Course(Catalogue,PrototypeMixin):
 
     def __init__(self,name,duration):
         super().__init__(name)
-        # self.name=name
         self.duration=duration
-        # self._category=None
         self.courses.update({self.name: self})
 
     def list_children(self):
@@ -158,13 +120,6 @@ class Course(Catalogue,PrototypeMixin):
             result=False
 
         return result
-
-    # def set_category(self,category):
-    #     if isinstance(Catalogue,category):
-    #         self._category=category
-    #         return True
-    #     else:
-    #         return False
 
     def set_duration(self,duration):
         self.duration=duration

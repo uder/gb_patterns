@@ -28,8 +28,6 @@ class Windy():
 		self.identitymap=IdentityMap()
 
 		self._load_from_db()
-		pprint(self.identitymap.identities)
-
 
 		self.confdir=self._get_config_dir_path()
 		self.middleware_fuctions=self.load_middleware()
