@@ -14,7 +14,7 @@ class IdentityMap(metaclass=Singleton):
 
     def __init__(self):
         self.identities[Category]=self.identities[Catalogue]
-        self.identities[Course]=self.identities[Course]
+        self.identities[Course]=self.identities[Catalogue]
 
     def get(self,klass,id):
         # result=None
@@ -29,7 +29,11 @@ class IdentityMap(metaclass=Singleton):
         self.identities.get(obj.__class__).update({id:obj})
 
     def get_all_ids(self,klass):
-        return self.identities.get(klass).keys()
+        try:
+            result=self.identities.get(klass).keys()
+        except:
+            result=[]
+        return result
 
     def get_by_name(self,klass,name):
         result=None

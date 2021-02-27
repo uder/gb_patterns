@@ -1,13 +1,14 @@
 import abc
 import sqlite3
 from windy.db.errors import DbRecordNotFoundException,DbCommitException,DbUpdateException,DbDeleteException
-from windy.models.catalogue import Category,Catalogue
+from windy.models.catalogue import Category,Course
 from windy.include_patterns.singleton import Singleton
 from windy.include_patterns.identity_map import IdentityMap
 
 from pprint import pprint
 
 class Mapper(metaclass=Singleton):
+    load_from_db_priority = 100
     # mappers={
     #     Category: CategoryMapper
     # }
@@ -54,6 +55,8 @@ class Mapper(metaclass=Singleton):
         return None
 
 class CategoryMapper(Mapper):
+    load_from_db_priority = 5
+
     def __init__(self, connection):
         super().__init__(connection)
         self.table = 'category'
@@ -76,19 +79,27 @@ class CategoryMapper(Mapper):
             if not category:
                 category=Category(name,desc,catid=catid)
             result.append(category)
-        self._get_childs_from_db(catid)
+        self._get_childs_from_db()
         return result
 
-    def _get_childs_from_db(self,catid):
-        sql_query=f"SELECT catid,child_id FROM {self.children_table};"
-        self.cursor.execute(sql_query)
-        for row in self.cursor.fetchall():
-            catid=row['catid']
-            child_id=row['child_id']
+    def _get_childs_from_db(self):
+        for catid in self.identitymap.get_all_ids(Category):
 
-            category=self.identitymap.get(Category,catid)
-            child=self.identitymap.get(Category,child_id)
-            category.append(child)
+            sql_query=f"SELECT catid,child_id FROM {self.children_table} WHERE catid={catid};"
+            self.cursor.execute(sql_query)
+            for row in self.cursor.fetchall():
+                catid=row['catid']
+                child_id=row['child_id']
+
+                category=self.identitymap.get(Category,catid)
+                child=self.identitymap.get(Category,child_id)
+                if not child:
+                    child = self.identitymap.get(Course, child_id)
+
+                print(f"{catid} child: {child_id}")
+                print(f"{category} child: {child}")
+                print(f"{category.name} child: {child.name}")
+                category.append(child,load_from_db=True)
 
     def get_by_id(self,catid):
         sql_query=f"SELECT * FROM {self.table} WHERE catid={catid};"
@@ -97,9 +108,9 @@ class CategoryMapper(Mapper):
             self.cursor.execute(sql_query)
             row=self.cursor.fetchone()
             if row:
-                result=Category(row['name'],row['desc'])
-                result.set_catid(catid)
-                self.identitymap.set(catid, result)
+                result=Category(row['name'],row['desc'],catid=catid)
+                # result.set_catid(catid)
+                # self.identitymap.set(catid, result)
             else:
                 raise DbRecordNotFoundException(f'table={self.table}; catid={catid}')
 
@@ -131,8 +142,8 @@ class CategoryMapper(Mapper):
         links_to_insert=catalogue_links_obj-catalogue_links_db
         links_to_delete=catalogue_links_db-catalogue_links_obj
 
-        print(links_to_insert)
-        print(links_to_delete)
+        # print(links_to_insert)
+        # print(links_to_delete)
         return links_to_insert,links_to_delete
 
     def _child_links_insert(self,links_to_insert):
@@ -170,6 +181,80 @@ class CategoryMapper(Mapper):
         sql_query=f"SELECT * FROM {self.children_table} WHERE catid={category.catid}"
         links_to_delete=self.cursor.execute(sql_query)
         self._child_links_delete(links_to_delete)
+
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbDeleteException(err.args)
+
+    def _check_orphan(self):
+        pass
+
+class CourseMapper(Mapper):
+    load_from_db_priority = 1
+
+    def __init__(self, connection):
+        super().__init__(connection)
+        self.table = 'course'
+
+    @classmethod
+    def mappers_key(cls):
+        return Course
+
+    def load_from_db(self):
+        sql_query=f"SELECT * FROM {self.table};"
+        self.cursor.execute(sql_query)
+        result=[]
+        for row in self.cursor.fetchall():
+            catid=row['catid']
+            name=row['name']
+            duration=row['duration']
+
+            course=self.identitymap.get(Course,catid)
+            if not course:
+                course=Course(name,duration,catid=catid)
+            result.append(course)
+        # self._get_childs_from_db(catid)
+        return result
+
+    def get_by_id(self,catid):
+        sql_query=f"SELECT * FROM {self.table} WHERE catid={catid};"
+        result=self.identitymap.get(Course,catid)
+        if not result:
+            self.cursor.execute(sql_query)
+            row=self.cursor.fetchone()
+            if row:
+                result=Course(row['name'],row['duration'],catid=catid)
+                # result.set_catid(catid)
+                # self.identitymap.set(catid, result)
+            else:
+                raise DbRecordNotFoundException(f'table={self.table}; catid={catid}')
+
+        return result
+
+    def insert(self,course):
+        tups=course.get_tuples()
+        sql_query=f"INSERT INTO {self.table} {tups[0]} VALUES {tups[1]};"
+        self.cursor.execute(sql_query)
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbCommitException(err.args)
+
+    def update(self,course):
+        course_dict=course.get_dict()
+        for key,value in course_dict.items():
+            sql_query=f"UPDATE {self.table} SET {key} = '{value}' WHERE catid={course.catid}"
+            # print (sql_query)
+            self.cursor.execute(sql_query)
+        try:
+            self.connection.commit()
+        except Exception as err:
+            raise DbUpdateException(err.args)
+
+    def delete(self,course):
+        sql_query=f"DELETE FROM {self.table} WHERE catid={course.catid}"
+        self.cursor.execute(sql_query)
 
         try:
             self.connection.commit()

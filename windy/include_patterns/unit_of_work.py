@@ -49,9 +49,6 @@ class UnitOfWork():
                 self.remove_objects.remove(obj)
 
     def commit(self):
-        print(self.new_objects)
-        print(self.dirty_objects)
-        print(self.remove_objects)
         self.insert_new()
         self.update_dirty()
         self.delete_remove()

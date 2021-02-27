@@ -1,5 +1,5 @@
 import abc
-from windy.db.errors import DbCreateTableException
+# from windy.db.errors import DbCreateTableException
 
 
 class Table(metaclass=abc.ABCMeta):
@@ -80,3 +80,22 @@ class DbInit():
         for table in Table.tables_list():
             table_object=table(self.connection)
             table_object.create(self.drop_if_exsists)
+
+class CourseTable(Table):
+    def __init__(self,connection):
+        super().__init__(connection)
+        self.table='course'
+
+    def create(self, drop_if_exists=False):
+        if drop_if_exists:
+            self.drop()
+        # else:
+        #     raise DbCreateTableException(self.table)
+        sql_query=f"""CREATE TABLE IF NOT EXISTS {self.table} (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+                        catid INTEGER NOT NULL UNIQUE,
+                        name TEXT NOT NULL UNIQUE,
+                        duration TEXT
+                    )"""
+        self.cursor.execute(sql_query)
+        self.connection.commit()

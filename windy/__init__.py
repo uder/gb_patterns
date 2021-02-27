@@ -55,7 +55,7 @@ class Windy():
 		return mapper
 
 	def _load_from_db(self):
-		for mapperclass in self.mapper.mappers.values():
+		for mapperclass in sorted(self.mapper.mappers.values(),key=lambda mapperclass: mapperclass.load_from_db_priority):
 			mapper=mapperclass(self.connection)
 			mapper.load_from_db()
 
