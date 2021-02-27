@@ -1,17 +1,27 @@
 from pprint import pprint
 from windy.models.user import User
-from windy.models.category import Category
-from windy.models.course import Course
+from windy.models.catalogue import Category,Course
+# from windy.models.catalogue import Course
 from windy.decorators.debug import debug
 from windy.router import Router
-from windy.cbv import ListView,CreateView
+from windy.cbv import ListView, CreateView
+from windy.include_patterns.unit_of_work import UnitOfWork
+# from windy.include_patterns.identity_map import IdentityMap
+
+# identitymap=IdentityMap()
 
 @Router.add_route('/cat/')
 class ListCategory(ListView):
 	template = "category_list.html"
 	def get_context(self,request):
 		context={}
-		context.update({'cat_list': Category.categories_list()})
+		# context.update({'cat_list': Category.categories_list()})
+		categories_list=[]
+		for cat in self._identitymap.get_all_ids(Category):
+			obj=self._identitymap.get(Category,cat)
+			if obj.__class__ is Category:
+				categories_list.append(obj.name)
+		context.update({'cat_list': categories_list})
 		return context
 
 @Router.add_route('/list/')
@@ -20,7 +30,12 @@ class ListCourse(ListView):
 	template = "index.html"
 	def get_context(self,request):
 		context={}
-		context.update({'courses_list': Course.get_courses_list()})
+		courses_list=[]
+		for cat in self._identitymap.get_all_ids(Course):
+			obj=self._identitymap.get(Course,cat)
+			if obj.__class__ is Course:
+				courses_list.append(obj.name)
+		context.update({'courses_list': courses_list})
 		return context
 
 @Router.add_route('/create-user/')
@@ -49,11 +64,15 @@ class CreateCategory(CreateView):
 			name = request['data'].get('category_name', "NO_CAT_PATCH")
 			desc = request['data'].get('category_desc', "No description")
 			parent_name = request['data'].get('category_parent', '')
-			parent = Category.get_category_by_name(parent_name)
+			# parent = Category.get_category_by_name(parent_name)
+			parent = self._identitymap.get_by_name(Category,parent_name)
 			if parent or parent_name == "":
 				category = Category(name, desc)
+				category.mark_new()
+				# pprint(self._identitymap.identities)
 				if parent_name:
 					parent.append(category)
+				UnitOfWork.get_current().commit()
 				self.notify(f'New category - {repr(category)}')
 			else:
 				request['err'] = "No such category. Try again"
@@ -66,10 +85,12 @@ class CreateCourse(CreateView):
 			name = request['data'].get('course_name', "NO_CRS_PATCH")
 			duration = request['data'].get('course_duration', "100h")
 			category_name = request['data'].get('course_category', '')
-			category = Category.get_category_by_name(category_name)
+			category = self._identitymap.get_by_name(Category,category_name)
 			if category:
 				course = Course(name, duration)
+				course.mark_new()
 				category.append(course)
+				UnitOfWork.get_current().commit()
 				self.notify(f'New course - {repr(course)}')
 			else:
 				request['err'] = "No such category. Try again"
@@ -84,9 +105,14 @@ class ModifyCourse(CreateView):
 			new_duration = request['data'].get('new_course_duration', None)
 			new_category_name = request['data'].get('new_course_category', None)
 			remove_category_name = request['data'].get('remove_course_category', None)
-			course = Course.get_course_by_name(name)
-			new_category = Category.get_category_by_name(new_category_name)
-			remove_category = Category.get_category_by_name(remove_category_name)
+			# course = Course.get_course_by_name(name)
+			course = self._identitymap.get_by_name(Course,name)
+			# new_category = Category.get_category_by_name(new_category_name)
+			new_category=self._identitymap.get_by_name(Category,new_category_name)
+			print(f"COURSE NEW CATEGORY {repr(new_category)}")
+			# remove_category = Category.get_category_by_name(remove_category_name)
+			remove_category=self._identitymap.get_by_name(Category,remove_category_name)
+			print(f"COURSE REMOVE CATEGORY {repr(remove_category)}")
 			if course:
 				if new_name:
 					if not course.set_name(new_name):
@@ -98,6 +124,7 @@ class ModifyCourse(CreateView):
 				if remove_category:
 					remove_category.remove(course)
 
+				UnitOfWork.get_current().commit()
 				message=f'Modify course - {repr(course)}'
 				self.notify(message)
 				for user in User.user_list_by_course(course):

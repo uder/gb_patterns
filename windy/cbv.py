@@ -1,6 +1,8 @@
 from pprint import pprint
 from windy.templates import render
 from windy.observer import CreateNotifier,Console,LogFile
+from windy.include_patterns.identity_map import IdentityMap
+
 class TemplateView():
     template = "base.html"
 
@@ -8,6 +10,7 @@ class TemplateView():
         self.context={}
         self.code='200 OK'
         self._publisher=self._init_publisher()
+        self._identitymap=IdentityMap()
 
     def get_context(self,request):
         return {}
