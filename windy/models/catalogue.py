@@ -83,12 +83,11 @@ class Category(Catalogue):
 
 
     def remove(self,object):
-        index=self._children.index(object)
-        print (f"REMOVE INDEX {index}")
-        print(self._children)
-        if index:
+        try:
             self._children.remove(object)
             self.mark_dirty()
+        except:
+            raise CatalogueException(f"Cant remove {object}")
 
     def __repr__(self):
         return f"Category(CatID: {self.catid} Name: {self.name}, Description: {self.desc} Children: {self._children})"
