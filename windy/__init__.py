@@ -11,6 +11,7 @@ import windy.include_patterns.unit_of_work
 import windy.db.mappers
 from windy.include_patterns.identity_map import IdentityMap
 from .router import Router
+from windy.models.config import Config
 
 from pprint import pprint
 
@@ -30,6 +31,8 @@ class Windy():
 		self._load_from_db()
 
 		self.confdir=self._get_config_dir_path()
+		self.config=Config(self.confdir)
+
 		self.middleware_fuctions=self.load_middleware()
 
 		self.render=templates.render

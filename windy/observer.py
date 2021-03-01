@@ -1,6 +1,7 @@
 import abc
 import os
 from datetime import datetime
+from windy.models.config import Config
 
 class Observer(metaclass=abc.ABCMeta):
     def __init__(self):
@@ -55,13 +56,14 @@ class Sms(Observer):
 class LogFile(Observer):
     def __init__(self,logfile):
         super().__init__()
+        self.config=Config()
         self.eol="\n"
         self._logfile=self._set_logfile(logfile)
 
     def _set_logfile(self,string):
         if not string.endswith('.log'):
             string=f'{string}.log'
-        logdir='logs'
+        logdir=self.config.logconfig.get('log_directory','logs')
         return os.path.join(logdir, string)
 
     def update(self, arg):
